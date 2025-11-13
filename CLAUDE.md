@@ -56,6 +56,34 @@ BRD → Specification → Planning → Tasks → Implementation → Validation
 | `/speckit.analyze` | 分析規格品質 | 規格目錄 |
 | `/speckit.checklist` | 產生檢查清單 | 功能上下文 |
 
+### 程式碼搜尋工具
+
+**ast-grep 優先原則**：
+
+本環境提供 `ast-grep` 工具用於語法感知的結構化搜尋。當需要進行程式碼搜尋時，應遵循以下原則：
+
+- **語法感知搜尋**：預設使用 `ast-grep --lang <language> -p '<pattern>'` 進行結構化搜尋
+- **適用語言**：支援 Rust、Python、JavaScript/TypeScript、Go、Java 等多種語言
+- **文字搜尋**：僅在明確要求純文字搜尋，或搜尋非程式碼內容（如文件、配置）時，才使用 `rg` 或 `grep`
+
+**使用範例**：
+```bash
+# 搜尋 Rust 中的特定函式定義
+ast-grep --lang rust -p 'fn $FUNC_NAME($$$) { $$$ }'
+
+# 搜尋 Python 中的類別定義
+ast-grep --lang python -p 'class $CLASS_NAME: $$$'
+
+# 搜尋 TypeScript 中的 React 元件
+ast-grep --lang typescript -p 'const $COMPONENT = () => { $$$ }'
+```
+
+**何時使用文字搜尋**：
+- 搜尋 Markdown 文件內容
+- 搜尋配置檔案（YAML、JSON、TOML）
+- 搜尋日誌或純文字檔案
+- 使用者明確要求純文字搜尋
+
 ### 功能分支管理
 
 ```bash
