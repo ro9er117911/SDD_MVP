@@ -60,11 +60,27 @@ BRD → Specification → Planning → Tasks → Implementation → Validation
 
 **ast-grep 優先原則**：
 
-本環境提供 `ast-grep` 工具用於語法感知的結構化搜尋。當需要進行程式碼搜尋時，應遵循以下原則：
+當環境中有 `ast-grep` 工具可用時，應優先使用它進行語法感知的結構化搜尋。
 
-- **語法感知搜尋**：預設使用 `ast-grep --lang <language> -p '<pattern>'` 進行結構化搜尋
+**安裝 ast-grep**（如果尚未安裝）：
+```bash
+# macOS (使用 Homebrew)
+brew install ast-grep
+
+# Linux (使用 cargo)
+cargo install ast-grep
+
+# 或下載預編譯二進位檔
+# https://github.com/ast-grep/ast-grep/releases
+```
+
+**搜尋工具選擇原則**：
+- **語法感知搜尋**（如可用）：使用 `ast-grep --lang <language> -p '<pattern>'` 進行結構化搜尋
 - **適用語言**：支援 Rust、Python、JavaScript/TypeScript、Go、Java 等多種語言
-- **文字搜尋**：僅在明確要求純文字搜尋，或搜尋非程式碼內容（如文件、配置）時，才使用 `rg` 或 `grep`
+- **文字搜尋**：在以下情況使用 `Grep` 工具或 `rg`：
+  - `ast-grep` 未安裝
+  - 搜尋非程式碼內容（如文件、配置）
+  - 使用者明確要求純文字搜尋
 
 **使用範例**：
 ```bash
