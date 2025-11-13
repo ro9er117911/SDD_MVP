@@ -12,8 +12,8 @@
 
 以下 5 個高優先級技術細節已在 2025-11-13 澄清完成：
 
-1. ✅ **BRD 檔案大小上限**：從 10 MB 調整為 **100 KB**（對應 GPT-4 Turbo 的 65K tokens，保留 buffer 給輸出）
-2. ✅ **Docker 容器工具清單**：明確定義安裝 Git + Bash + **Node.js 18+ + mermaid-cli** + curl + 基本檔案工具
+1. ✅ **BRD 檔案大小上限**：從 10 MB 調整為 **100 KB**（對應 GPT-5 nano 的 context window，保留 buffer 給輸出）
+2. ✅ **Docker 容器工具清單**：明確定義安裝 Git + **Claude CLI + SpecKit CLI** + Node.js 18+ + Python 3.11 + uv + mermaid-cli + curl + 基本檔案工具
 3. ✅ **GitHub Token 權限**：使用 Fine-grained token，權限為 **contents:write + pull_requests:write + workflows:write + metadata:read**
 4. ✅ **並行處理佇列機制**：採用 **FIFO 佇列**（長度上限 10），超額請求自動排隊並顯示預估等待時間
 5. ✅ **審核批准規則**：SA 與 Architect **至少 1 位批准**即可合併 PR，明確定義各自審核範圍
@@ -87,15 +87,15 @@ IT 需求團隊在需求對齊過程中面臨以下關鍵痛點：
 
 ### User Story 2 - 自動生成 SDD 並提交 GitHub (Priority: P1) 🎯 MVP
 
-Bot 接收 BRD 後，透過 GPT-4 自動分析並生成結構化的 SDD 文件，在隔離環境中執行 speckit.sh 腳本，並將產出提交至 GitHub 新分支。
+Bot 接收 BRD 後，GPT-5 nano 分析並產生結構化的需求摘要與 Prompt，啟動 Docker 容器讓 Claude CLI 執行 SpecKit 指令（/speckit.specify, /speckit.plan, /speckit.tasks）生成 SDD 文件，並將產出提交至 GitHub 新分支。
 
 **Why this priority**: 這是系統的核心價值所在——自動化 BRD 到 SDD 的轉換。沒有這個功能，系統無法提供實質價值。
 
-**Independent Test**: 可使用預先準備的標準 BRD 範例，驗證 Bot 是否能在 Docker 容器中成功生成包含 5 個章節的 SDD，並在 GitHub 建立新分支與 PR。透過檢查 PR 內容完整性即可驗證。
+**Independent Test**: 可使用預先準備的標準 BRD 範例，驗證 GPT-5 nano 能否正確分析 BRD 並生成 brd_analysis.json，Claude CLI 能否在 Docker 容器中成功執行 SpecKit 指令生成包含 5 個章節的 SDD，並在 GitHub 建立新分支與 PR。透過檢查 PR 內容完整性即可驗證。
 
 **Acceptance Scenarios**:
 
-1. **Given** Bot 已解析有效的 BRD 內容，**When** GPT-4 完成 BRD → SDD 轉換，**Then** 系統在隔離的 Docker 容器中執行 speckit.sh 腳本
+1. **Given** Bot 已解析有效的 BRD 內容，**When** GPT-5 nano 完成 BRD 分析並產生 brd_analysis.json，**Then** 系統啟動隔離的 Docker 容器，並將 brd_analysis.json 掛載至 /input/brd_analysis.json
 2. **Given** SDD 生成成功，**When** 系統準備提交至 GitHub，**Then** 建立新分支命名為 `bot/spec-{timestamp}`（例如：bot/spec-20251113-143022）
 3. **Given** 新分支已建立，**When** 系統提交檔案，**Then** commit 包含以下檔案結構：
    - `specs/001-{功能名稱}/01_系統概述.md`
@@ -218,13 +218,13 @@ PR 被核准並合併至 main 分支後，GitHub Actions 自動觸發 CI 流程�
 #### BRD 解析與驗證
 
 - **FR-006**: 系統必須驗證上傳檔案為 Markdown 格式（.md 副檔名）
-- **FR-007**: 系統必須檢查檔案大小不超過 100 KB（對應約 65K tokens，保留 buffer 給 GPT-4 Turbo 的 SDD 輸出）
+- **FR-007**: 系統必須檢查檔案大小不超過 100 KB（對應 GPT-5 nano 的 context window，保留 buffer 給 SDD 輸出）
 - **FR-008**: 系統必須解析 BRD 內容並提取關鍵章節（需求概述、功能需求、非功能需求）
 - **FR-009**: 系統必須在 BRD 格式不符時，提供具體錯誤訊息與 BRD 模板連結
 
-#### GPT 整合與 SDD 生成
+#### GPT-5 nano 協調與 SDD 生成
 
-- **FR-010**: 系統必須使用 GPT-4 API 將 BRD 內容轉換為結構化 SDD
+- **FR-010**: 系統必須使用 GPT-5 nano 分析 BRD 內容並產生結構化的需求摘要（brd_analysis.json），協調 Claude CLI 執行 SpecKit 指令生成 SDD
 - **FR-011**: 系統必須生成包含以下 5 個強制章節的 SDD：
   1. 系統概述
   2. 架構設計
@@ -240,17 +240,19 @@ PR 被核准並合併至 main 分支後，GitHub Actions 自動觸發 CI 流程�
 
 #### Docker 容器執行
 
-- **FR-015**: 系統必須在隔離的 Docker 容器中執行 speckit.sh 腳本
-- **FR-016**: 容器必須使用 python:3.11-slim 基礎映像，並安裝以下工具：
-  - Git（版本控制）
-  - Bash（執行 speckit.sh）
-  - Node.js 18+（執行 mermaid-cli）
-  - npm（安裝 @mermaid-js/mermaid-cli）
-  - curl（下載遠端資源）
+- **FR-015**: 系統必須在隔離的 Docker 容器中執行 Claude CLI，由 Claude CLI 呼叫 SpecKit 指令（/speckit.specify, /speckit.plan, /speckit.tasks）
+- **FR-016**: 容器必須使用 node:18-slim 基礎映像，並安裝以下工具：
+  - **Claude CLI**（`@anthropic-ai/claude-code` via npm）：Agent 執行層
+  - **SpecKit CLI**（`specify-cli` via uv tool install）：SDD 生成框架
+  - **Git**（版本控制與 GitHub 操作）
+  - **Python 3.11 + uv**（SpecKit CLI 依賴）
+  - **Node.js 18+ + npm**（Claude CLI 執行環境）
+  - **mermaid-cli**（`@mermaid-js/mermaid-cli`）：圖表語法驗證
+  - **curl**（下載遠端資源）
   - 基本檔案工具：mkdir, cp, mv, rm
 - **FR-017**: 容器必須在任務完成或逾時（10 分鐘）後自動銷毀
 - **FR-018**: 容器必須限制資源使用（CPU: 2 核心上限，記憶體: 4GB 上限）
-- **FR-019**: 容器內僅允許執行白名單命令：git, bash, node, npm, mermaid, speckit.sh, curl, mkdir, cp, mv, rm。禁止執行：編譯器（gcc, javac）、套件管理器（apt, yum）、網路掃描工具（nmap）
+- **FR-019**: 容器內僅允許執行白名單命令：claude-cli, /speckit.*, git, bash, node, npm, python3, uv, mmdc（mermaid-cli）, curl, mkdir, cp, mv, rm。禁止執行：編譯器（gcc, javac）、套件管理器（apt, yum）、網路掃描工具（nmap）
 
 #### GitHub 整合
 
@@ -407,16 +409,19 @@ PR 被核准並合併至 main 分支後，GitHub Actions 自動觸發 CI 流程�
 
 1. **Slack API**：依賴 Slack Event API 接收訊息事件、Slack Web API 發送訊息
 2. **GitHub API**：依賴 GitHub REST API 建立分支、提交檔案、建立 PR、設定審核者
-3. **OpenAI GPT-4 API**：依賴 GPT-4 API 進行 BRD 到 SDD 的自然語言轉換
-4. **Docker Engine**：依賴 Docker 執行隔離容器
-5. **GitHub Actions**：依賴 GitHub Actions 執行 post-merge 自動化流程（圖表轉換、文件轉換、Release 建立）
+3. **GPT-5 nano API**：依賴 GPT-5 nano 進行 BRD 分析、需求提取、Prompt 生成與決策協調
+4. **Claude CLI**：依賴 Anthropic Claude CLI (`@anthropic-ai/claude-code`) 作為 Agent 執行 SpecKit 指令與文件操作
+5. **GitHub SpecKit CLI**：依賴 SpecKit CLI (`specify-cli`) 提供 SDD 生成框架（/speckit.specify, /speckit.plan, /speckit.tasks 等指令）
+6. **Docker Engine**：依賴 Docker 執行隔離容器
+7. **GitHub Actions**：依賴 GitHub Actions 執行 post-merge 自動化流程（圖表轉換、文件轉換、Release 建立）
 
 ### 內部相依
 
 1. **憲法文件**：SDD 生成必須遵循專案憲法定義的格式標準與安全約束
-2. **speckit.sh 腳本**：依賴 SpecKit 工具鏈執行 SDD 檔案結構初始化
-3. **BRD 模板**：（若存在）依賴統一的 BRD 模板確保解析成功率
-4. **Mermaid 圖表風格指南**：依賴團隊定義的圖表風格確保一致性
+2. **SpecKit CLI 指令集**：依賴 SpecKit CLI 的 `/speckit.specify`, `/speckit.plan`, `/speckit.tasks` 等指令執行 SDD 生成流程
+3. **brd_analysis.json 格式**：依賴 GPT-5 nano 產生的標準化 BRD 分析檔案，作為 Claude CLI 的輸入
+4. **BRD 模板**：（若存在）依賴統一的 BRD 模板確保解析成功率
+5. **Mermaid 圖表風格指南**：依賴團隊定義的圖表風格確保一致性
 
 ### 團隊相依
 
