@@ -30,8 +30,12 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
     && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# 安裝 Python 工具 (uv)
-RUN pip3 install --no-cache-dir uv
+# 安裝 uv (Python 套件管理工具) - 使用官方安裝腳本並複製實際二進位檔案
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && cp -L /root/.local/bin/uv /usr/local/bin/uv \
+    && cp -L /root/.local/bin/uvx /usr/local/bin/uvx \
+    && chmod +x /usr/local/bin/uv /usr/local/bin/uvx
+ENV PATH="/usr/local/bin:$PATH"
 
 # 安裝 Claude CLI
 RUN npm install -g @anthropic-ai/claude-code
@@ -43,8 +47,8 @@ RUN npm install -g @anthropic-ai/claude-code
 # 安裝 Mermaid CLI
 RUN npm install -g @mermaid-js/mermaid-cli
 
-# 建立非 root 使用者
-RUN useradd -m -u 1000 -s /bin/bash specbot
+# 建立非 root 使用者 (使用 UID 2000 避免與 node 使用者衝突)
+RUN useradd -m -u 2000 -s /bin/bash specbot
 
 # 設定工作目錄
 WORKDIR /workspace

@@ -200,6 +200,171 @@ refactor: 重構描述
 4. **Docker 隔離**：所有自動化操作在容器中執行，任務完成後銷毀
 5. **憲法至上**：憲法效力高於所有其他實踐，違反需明確記錄並獲批准
 
+## 操作預防措施
+
+### 1. Context 管理
+**問題**：長時間對話導致 token 預算耗盡或回應中斷
+
+**預防措施**：
+- 定期總結當前進度，開始新對話以釋放 context
+- 使用 Task agent (`subagent_type=Explore` 或 `general-purpose`) 處理複雜探索任務
+- 避免在單次對話中處理過多大型檔案
+- 重要決策和狀態應記錄在 spec.md 或 plan.md 而非依賴對話歷史
+
+### 2. Docker 環境健康檢查
+**問題**：容器建置失敗或執行異常
+
+**預防措施**：
+```bash
+# 執行前檢查
+docker ps                           # 確認 Docker daemon 運行
+docker system df                    # 檢查磁碟空間
+docker system prune -f              # 清理未使用的資源（定期執行）
+
+# 容器健康狀態監控
+docker logs <container_id>          # 檢查容器日誌
+docker inspect <container_id>       # 檢查容器配置
+```
+
+**自動檢查**：
+- 在執行 Docker 操作前先執行 `check-prerequisites.sh`
+- 確保可用磁碟空間 > 10GB
+- 確保記憶體可用量 > 6GB（容器需 4GB + 系統保留）
+
+### 3. Git 狀態管理
+**問題**：分支衝突、未提交變更遺失、detached HEAD
+
+**預防措施**：
+```bash
+# 開始新任務前
+git status                          # 確認工作目錄乾淨
+git fetch origin                    # 同步遠端分支資訊
+git branch -vv                      # 檢查分支追蹤狀態
+
+# 切換分支前
+git stash push -m "WIP: 任務描述"  # 暫存未完成的工作
+git checkout <branch>
+git stash pop                       # 恢復工作（若需要）
+
+# 定期保存進度
+git add -A && git commit -m "wip: 階段性儲存"
+git push origin <branch>
+```
+
+**避免 detached HEAD**：
+- 永遠使用分支名稱而非 commit SHA 切換
+- 若需檢查歷史 commit，使用 `git log` 或 `git show` 而非 `git checkout <sha>`
+
+### 4. 環境依賴驗證
+**問題**：缺少必要工具或版本不符
+
+**預防措施**：
+```bash
+# 專案初始化或變更環境後執行
+.specify/scripts/bash/check-prerequisites.sh
+
+# 確認關鍵工具版本
+python --version                    # 應為 3.11.x
+docker --version                    # 應為 20.10.x 以上
+git --version                       # 應為 2.30.x 以上
+
+# Python 依賴同步
+pip install -r requirements.txt     # 或使用 poetry install
+pip-audit                           # 檢查安全漏洞
+```
+
+### 5. 長時間執行任務管理
+**問題**：測試或建置執行時間過長導致逾時
+
+**預防措施**：
+- 使用 `run_in_background=true` 執行長時間任務
+- 分階段執行大型測試套件：
+  ```bash
+  pytest tests/unit/        # 先執行單元測試（快速）
+  pytest tests/integration/ # 再執行整合測試（較慢）
+  ```
+- 設定合理的 timeout（建議 < 5 分鐘單次操作）
+- 使用 `BashOutput` 定期檢查背景任務進度
+
+### 6. 錯誤追蹤與復原
+**問題**：錯誤發生後缺乏上下文資訊
+
+**預防措施**：
+- **即時記錄**：在 plan.md 或 tasks.md 中記錄遇到的問題與解決方案
+- **結構化日誌**：包含 correlation_id、timestamp、操作上下文
+- **快速復原點**：
+  ```bash
+  git tag checkpoint-YYYYMMDD-HHMM  # 建立檢查點
+  git push origin --tags            # 推送至遠端
+
+  # 若需回滾
+  git reset --hard checkpoint-YYYYMMDD-HHMM
+  ```
+
+### 7. 資源洩漏預防
+**問題**：背景程序未清理、檔案鎖定、埠號佔用
+
+**預防措施**：
+```bash
+# 定期檢查殭屍程序
+ps aux | grep python                # 檢查 Python 程序
+ps aux | grep docker                # 檢查 Docker 程序
+
+# 清理佔用埠號
+lsof -i :8000                       # 檢查埠號佔用
+kill -9 <PID>                       # 強制終止（謹慎使用）
+
+# Docker 資源清理
+docker ps -a | grep Exited          # 列出已停止容器
+docker rm $(docker ps -a -q -f status=exited)  # 清理已停止容器
+```
+
+### 8. Secrets 洩漏預防
+**問題**：API tokens 或敏感資料意外提交
+
+**預防措施**：
+- **提交前檢查**：
+  ```bash
+  git diff --cached                 # 檢視即將提交的內容
+  grep -r "sk-" .                   # 搜尋可能的 API keys
+  grep -r "token" .env*             # 確認 .env 未被追蹤
+  ```
+- **使用 .gitignore**：確保 `.env`, `.env.local`, `secrets/` 已列入
+- **Pre-commit hook**：安裝 `detect-secrets` 或 `git-secrets`
+
+### 9. 通訊中斷復原
+**問題**：網路問題或系統中斷導致操作未完成
+
+**復原檢查清單**：
+```bash
+# 1. 檢查當前狀態
+git status                          # 工作目錄狀態
+git log -1                          # 最後一次 commit
+docker ps -a                        # 容器狀態
+
+# 2. 檢查未完成的操作
+git reflog                          # 查看所有操作歷史
+git stash list                      # 查看暫存內容
+
+# 3. 恢復工作上下文
+cat specs/*/tasks.md | grep "in_progress"  # 查看進行中的任務
+git diff HEAD                       # 查看未提交變更
+
+# 4. 清理殘留
+docker rm -f $(docker ps -a -q)     # 清理所有容器（謹慎）
+git clean -fd                       # 清理未追蹤檔案（謹慎）
+```
+
+### 10. 效能最佳化原則
+**問題**：操作回應緩慢或效能下降
+
+**最佳實踐**：
+- **平行化獨立操作**：使用多個工具呼叫而非序列執行
+- **增量操作**：使用 `git diff` 僅處理變更檔案
+- **快取利用**：Docker layer caching, pip cache
+- **選擇性測試**：使用 `pytest -k <pattern>` 執行特定測試
+- **限制輸出**：使用 `head`, `tail`, `grep` 過濾大型輸出
+
 ## Active Technologies
 - Python 3.11 (001-spec-bot-sdd-integration)
 

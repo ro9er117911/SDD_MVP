@@ -81,11 +81,11 @@
   # ✅ PASSED: Dockerfile syntax valid
   ```
 
-- [ ] T007 建立 Docker 映像並執行 T002 測試
+- [X] T007 建立 Docker 映像並執行 T002 測試 ✅
   ```bash
   docker build -f docker/spec-bot-sandbox/Dockerfile -t spec-bot-sandbox:test .
   docker run --rm spec-bot-sandbox:test bash tests/docker/test_container_tools.sh
-  # Expected: ✅ All tools installed correctly
+  # ✅ PASSED: All tools installed correctly (uv 0.9.9, Claude CLI 2.0.37, Git 2.39.5, gh 2.83.0, mmdc 11.12.0)
   ```
 
 **✅ Checkpoint #1 完成**: Docker 容器環境建立完成，所有工具已安裝並驗證
