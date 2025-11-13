@@ -32,12 +32,12 @@
 
 ### 測試先行 (TDD 紅燈階段)
 
-- [ ] T001 撰寫 Dockerfile 語法驗證測試
+- [X] T001 撰寫 Dockerfile 語法驗證測試 ✅
   - 測試檔案: `tests/docker/test_dockerfile_syntax.sh`
   - 驗證: Dockerfile 語法正確，無 Hadolint 警告
   - 驗證: 基礎映像為 `node:18-slim`
 
-- [ ] T002 撰寫容器工具安裝驗證測試
+- [X] T002 撰寫容器工具安裝驗證測試 ✅
   - 測試檔案: `tests/docker/test_container_tools.sh`
   - 驗證: Claude CLI 已安裝 (`claude-cli --version`)
   - 驗證: SpecKit CLI 已安裝 (`specify --version`)
@@ -47,7 +47,7 @@
 
 ### 實作 (TDD 綠燈階段)
 
-- [ ] T003 建立 Dockerfile (docker/spec-bot-sandbox/Dockerfile)
+- [X] T003 建立 Dockerfile (docker/spec-bot-sandbox/Dockerfile) ✅
   - 參考: plan.md 第 215-247 行
   - 內容:
     - FROM node:18-slim
@@ -60,7 +60,7 @@
     - 建立非 root 使用者 (specbot, UID 1000)
     - WORKDIR /workspace
 
-- [ ] T004 建立 docker-compose.yml (docker/docker-compose.yml)
+- [X] T004 建立 docker-compose.yml (docker/docker-compose.yml) ✅
   - 參考: plan.md 第 249-291 行
   - 內容:
     - 服務名稱: spec-bot-worker
@@ -70,15 +70,15 @@
     - 網路: spec-bot-net (isolated)
     - 生命週期: restart=no, stop_grace_period=30s
 
-- [ ] T005 建立 .dockerignore 檔案 (docker/.dockerignore)
+- [X] T005 建立 .dockerignore 檔案 (docker/.dockerignore) ✅
   - 排除: `.git/`, `node_modules/`, `__pycache__/`, `*.pyc`, `venv/`
 
 ### 驗證 (TDD 綠燈驗證)
 
-- [ ] T006 執行 T001 測試 - 驗證 Dockerfile 語法
+- [X] T006 執行 T001 測試 - 驗證 Dockerfile 語法 ✅
   ```bash
   bash tests/docker/test_dockerfile_syntax.sh
-  # Expected: ✅ Dockerfile syntax valid
+  # ✅ PASSED: Dockerfile syntax valid
   ```
 
 - [ ] T007 建立 Docker 映像並執行 T002 測試
