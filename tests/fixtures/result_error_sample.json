@@ -1,0 +1,78 @@
+{
+  "correlation_id": "req-20251113-105530-xyz",
+  "status": "error",
+  "execution_time_seconds": 45,
+  "error_type": "SPECKIT_EXECUTION_ERROR",
+  "error_message": "/speckit.specify failed: Missing 'functional_requirements' in BRD content. The BRD must include a '## 功能需求' section with at least one functional requirement.",
+  "stack_trace": "Error: SpecKit execution failed\n    at SpecKitRunner.execute (run_speckit.sh:152)\n    at ClaudeCLI.runCommand (claude-cli:234)\n    at main (run_speckit.sh:45)",
+  "troubleshooting_steps": [
+    "檢查 BRD 是否包含「## 功能需求」章節",
+    "確認功能需求章節至少有一個需求項目",
+    "參考 BRD 模板：https://github.com/your-org/spec-bot/blob/main/templates/brd_template.md",
+    "若問題持續，請在 #spec-bot-support 頻道回報並提供 correlation_id"
+  ],
+  "logs": [
+    {
+      "level": "INFO",
+      "message": "開始處理請求",
+      "timestamp": "2025-11-13T10:55:30Z",
+      "component": "orchestrator",
+      "context": {
+        "correlation_id": "req-20251113-105530-xyz"
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "初始化 Git repository",
+      "timestamp": "2025-11-13T10:55:35Z",
+      "component": "git-manager"
+    },
+    {
+      "level": "INFO",
+      "message": "執行 /speckit.specify",
+      "timestamp": "2025-11-13T10:55:40Z",
+      "component": "claude-cli"
+    },
+    {
+      "level": "ERROR",
+      "message": "SpecKit 執行失敗：缺少必要章節",
+      "timestamp": "2025-11-13T10:56:10Z",
+      "component": "claude-cli",
+      "context": {
+        "missing_sections": [
+          "功能需求"
+        ],
+        "brd_file": "/input/brd_analysis.json"
+      }
+    },
+    {
+      "level": "ERROR",
+      "message": "/speckit.specify 執行失敗",
+      "timestamp": "2025-11-13T10:56:12Z",
+      "component": "speckit-runner",
+      "context": {
+        "exit_code": 1,
+        "error": "Missing 'functional_requirements' in input"
+      }
+    },
+    {
+      "level": "WARNING",
+      "message": "清理 Git 分支",
+      "timestamp": "2025-11-13T10:56:14Z",
+      "component": "git-manager",
+      "context": {
+        "branch": "bot/spec-1731495330",
+        "action": "delete"
+      }
+    },
+    {
+      "level": "ERROR",
+      "message": "處理失敗",
+      "timestamp": "2025-11-13T10:56:15Z",
+      "component": "orchestrator",
+      "context": {
+        "error_type": "SPECKIT_EXECUTION_ERROR"
+      }
+    }
+  ]
+}

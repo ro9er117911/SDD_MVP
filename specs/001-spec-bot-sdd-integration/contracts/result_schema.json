@@ -1,0 +1,282 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/spec-bot/schemas/result.json",
+  "title": "Result Schema",
+  "description": "Claude CLI 在 Docker 容器內執行完成後的輸出結果",
+  "type": "object",
+  "required": [
+    "correlation_id",
+    "status",
+    "execution_time_seconds",
+    "logs"
+  ],
+  "properties": {
+    "correlation_id": {
+      "type": "string",
+      "description": "請求唯一識別碼（與 brd_analysis.json 相同）",
+      "pattern": "^req-[a-zA-Z0-9-]+$",
+      "examples": [
+        "req-abc-123-xyz"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "description": "執行狀態",
+      "enum": [
+        "success",
+        "error"
+      ]
+    },
+    "execution_time_seconds": {
+      "type": "integer",
+      "description": "執行時間（秒）",
+      "minimum": 0,
+      "maximum": 600
+    },
+    "outputs": {
+      "type": "object",
+      "description": "產生的輸出檔案（僅成功時存在）",
+      "properties": {
+        "spec_md": {
+          "type": "object",
+          "description": "規格書檔案資訊",
+          "required": [
+            "path",
+            "size_bytes"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "檔案路徑"
+            },
+            "size_bytes": {
+              "type": "integer",
+              "description": "檔案大小（bytes）",
+              "minimum": 0
+            },
+            "checksum": {
+              "type": "string",
+              "description": "檔案 SHA256 checksum"
+            }
+          }
+        },
+        "plan_md": {
+          "type": "object",
+          "description": "計畫書檔案資訊",
+          "required": [
+            "path",
+            "size_bytes"
+          ],
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "checksum": {
+              "type": "string"
+            }
+          }
+        },
+        "tasks_md": {
+          "type": "object",
+          "description": "任務清單檔案資訊",
+          "required": [
+            "path",
+            "size_bytes"
+          ],
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "checksum": {
+              "type": "string"
+            }
+          }
+        },
+        "diagrams": {
+          "type": "array",
+          "description": "產生的圖表檔案清單",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "mermaid",
+                  "png",
+                  "svg"
+                ]
+              },
+              "size_bytes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "git_operations": {
+      "type": "object",
+      "description": "Git 操作結果（僅成功時存在）",
+      "required": [
+        "branch",
+        "commit_sha",
+        "pr_url"
+      ],
+      "properties": {
+        "branch": {
+          "type": "string",
+          "description": "Git 分支名稱",
+          "pattern": "^bot/.*",
+          "examples": [
+            "bot/spec-1731491400"
+          ]
+        },
+        "commit_sha": {
+          "type": "string",
+          "description": "Commit SHA",
+          "pattern": "^[a-f0-9]{7,40}$",
+          "examples": [
+            "a1b2c3d",
+            "a1b2c3d4e5f6g7h8"
+          ]
+        },
+        "commit_message": {
+          "type": "string",
+          "description": "Commit 訊息"
+        },
+        "push_status": {
+          "type": "string",
+          "description": "Push 狀態",
+          "enum": [
+            "success",
+            "failed",
+            "skipped"
+          ]
+        },
+        "pr_url": {
+          "type": "string",
+          "description": "Pull Request URL",
+          "format": "uri",
+          "pattern": "^https://github\\.com/[^/]+/[^/]+/pull/\\d+$",
+          "examples": [
+            "https://github.com/your-org/spec-bot/pull/123"
+          ]
+        }
+      }
+    },
+    "error_type": {
+      "type": "string",
+      "description": "錯誤類型（僅錯誤時存在）",
+      "enum": [
+        "BRD_VALIDATION_ERROR",
+        "SPECKIT_EXECUTION_ERROR",
+        "GIT_ERROR",
+        "GITHUB_API_ERROR",
+        "CONTAINER_TIMEOUT",
+        "MERMAID_SYNTAX_ERROR",
+        "UNKNOWN_ERROR"
+      ]
+    },
+    "error_message": {
+      "type": "string",
+      "description": "錯誤訊息（僅錯誤時存在）",
+      "minLength": 1
+    },
+    "stack_trace": {
+      "type": "string",
+      "description": "錯誤堆疊追蹤（僅錯誤時存在）"
+    },
+    "troubleshooting_steps": {
+      "type": "array",
+      "description": "疑難排解步驟建議（僅錯誤時存在）",
+      "items": {
+        "type": "string"
+      }
+    },
+    "logs": {
+      "type": "array",
+      "description": "執行日誌",
+      "items": {
+        "type": "object",
+        "required": [
+          "level",
+          "message",
+          "timestamp"
+        ],
+        "properties": {
+          "level": {
+            "type": "string",
+            "description": "日誌級別",
+            "enum": [
+              "DEBUG",
+              "INFO",
+              "WARNING",
+              "ERROR",
+              "CRITICAL"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "日誌訊息"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "時間戳記",
+            "format": "date-time"
+          },
+          "component": {
+            "type": "string",
+            "description": "元件名稱"
+          },
+          "context": {
+            "type": "object",
+            "description": "額外上下文資訊"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "success"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "git_operations"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "error"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "error_type",
+          "error_message"
+        ]
+      }
+    }
+  ]
+}

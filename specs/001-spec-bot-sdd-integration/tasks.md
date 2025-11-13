@@ -100,55 +100,55 @@
 
 ### 測試先行 (TDD 紅燈階段)
 
-- [ ] T008 撰寫 brd_analysis.json Schema 驗證測試
+- [X] T008 撰寫 brd_analysis.json Schema 驗證測試 ✅
   - 測試檔案: `tests/contracts/test_brd_analysis_schema.sh`
   - 使用 ajv-cli 驗證 JSON Schema
   - 測試範例: `tests/fixtures/brd_analysis_sample.json`
   - 驗證必要欄位: correlation_id, timestamp, brd_content, analysis, speckit_commands
 
-- [ ] T009 撰寫 result.json Schema 驗證測試
+- [X] T009 撰寫 result.json Schema 驗證測試 ✅
   - 測試檔案: `tests/contracts/test_result_schema.sh`
   - 驗證必要欄位: correlation_id, status, git_operations, logs
   - 測試成功案例與錯誤案例
 
 ### 實作 (TDD 綠燈階段)
 
-- [ ] T010 建立 brd_analysis.json JSON Schema (specs/001-spec-bot-sdd-integration/contracts/brd_analysis_schema.json)
+- [X] T010 建立 brd_analysis.json JSON Schema (specs/001-spec-bot-sdd-integration/contracts/brd_analysis_schema.json) ✅
   - 參考: research.md 第 628-672 行
   - 定義: correlation_id (pattern: ^req-[a-zA-Z0-9-]+$)
   - 定義: brd_content (minLength: 100, maxLength: 102400)
   - 定義: analysis.functional_requirements (array of FR-xxx)
   - 定義: speckit_commands (array of strings)
 
-- [ ] T011 建立 result.json JSON Schema (specs/001-spec-bot-sdd-integration/contracts/result_schema.json)
+- [X] T011 建立 result.json JSON Schema (specs/001-spec-bot-sdd-integration/contracts/result_schema.json) ✅
   - 參考: research.md 第 575-624 行
   - 定義: status (enum: success, error)
   - 定義: git_operations (branch, commit_sha, pr_url)
   - 定義: error_type (SPECKIT_EXECUTION_ERROR, GIT_ERROR, etc.)
 
-- [ ] T012 建立 brd_analysis.json 測試範例 (tests/fixtures/brd_analysis_sample.json)
+- [X] T012 建立 brd_analysis.json 測試範例 (tests/fixtures/brd_analysis_sample.json) ✅
   - 包含完整的 BRD 內容
   - 包含 5 個功能需求 (FR-001 到 FR-005)
   - 包含 3 個非功能需求
   - 包含 speckit_commands 陣列
 
-- [ ] T013 建立 result.json 測試範例 (tests/fixtures/result_success_sample.json, result_error_sample.json)
+- [X] T013 建立 result.json 測試範例 (tests/fixtures/result_success_sample.json, result_error_sample.json) ✅
   - 成功案例: status=success, 包含 PR URL
   - 錯誤案例: status=error, 包含 error_type 與 error_message
 
 ### 驗證 (TDD 綠燈驗證)
 
-- [ ] T014 執行 T008 測試 - 驗證 brd_analysis.json Schema
+- [X] T014 執行 T008 測試 - 驗證 brd_analysis.json Schema ✅
   ```bash
-  npm install -g ajv-cli
+  npm install -g ajv-cli ajv-formats
   bash tests/contracts/test_brd_analysis_schema.sh
-  # Expected: ✅ Schema validation passed
+  # ✅ PASSED: All tests passed
   ```
 
-- [ ] T015 執行 T009 測試 - 驗證 result.json Schema
+- [X] T015 執行 T009 測試 - 驗證 result.json Schema ✅
   ```bash
   bash tests/contracts/test_result_schema.sh
-  # Expected: ✅ Schema validation passed (success & error cases)
+  # ✅ PASSED: Schema validation passed (success & error cases)
   ```
 
 **✅ Checkpoint #2 完成**: 通訊協議定義完成，契約測試通過

@@ -1,0 +1,116 @@
+{
+  "correlation_id": "req-20251113-101520-abc",
+  "timestamp": "2025-11-13T10:15:20Z",
+  "brd_content": "# 業務需求文件：客戶管理系統\n\n## 專案概述\n本專案旨在開發一個客戶管理系統（CRM），幫助業務團隊管理客戶資料、追蹤銷售機會、並自動化行銷流程。\n\n## 功能需求\n\n### FR-001: 客戶資料管理\n業務人員可以新增、編輯、刪除客戶資料，包含姓名、公司、聯絡方式、產業類別等基本資訊。\n\n### FR-002: 銷售機會追蹤\n業務人員可以建立銷售機會，記錄預期成交金額、預計成交日期、目前階段（初步接觸、需求評估、提案、議價、成交）。\n\n### FR-003: 行銷自動化\n系統可以根據客戶標籤自動發送 Email 行銷內容，並追蹤開信率與點擊率。\n\n### FR-004: 報表儀表板\n主管可以查看銷售漏斗報表、業務績效排名、客戶來源分析等視覺化圖表。\n\n### FR-005: 權限管理\n系統管理員可以設定不同角色（業務、主管、管理員）的存取權限，業務只能看到自己的客戶資料。\n\n## 非功能需求\n\n### NFR-001: 效能\n客戶列表頁面載入時間需 < 2 秒（1000 筆客戶資料）。\n\n### NFR-002: 安全性\n所有 API 需使用 JWT 認證，密碼需使用 bcrypt 加密。\n\n### NFR-003: 可用性\n系統正常運行時間 > 99.5%，每月停機時間 < 3.6 小時。\n\n## 限制條件\n\n### 技術限制\n- 前端需支援 Chrome、Firefox、Safari 最新版本\n- 後端需使用 RESTful API 架構\n\n### 時程限制\n- MVP 版本需在 3 個月內完成\n\n### 預算限制\n- 開發預算不超過 NT$ 500,000\n\n## 使用者場景\n\n### 場景 1: 業務新增客戶\n**Given** 業務登入系統  \n**When** 點擊「新增客戶」按鈕  \n**And** 填寫客戶姓名、公司、Email、電話  \n**Then** 系統顯示「客戶新增成功」  \n**And** 客戶出現在客戶列表中\n\n### 場景 2: 主管查看銷售報表\n**Given** 主管登入系統  \n**When** 進入「報表儀表板」頁面  \n**Then** 系統顯示本月銷售漏斗圖表  \n**And** 顯示各業務績效排名\n",
+  "brd_metadata": {
+    "file_name": "CRM_BRD_v1.md",
+    "file_size_bytes": 2456,
+    "uploaded_by": "U12345ABC",
+    "slack_channel": "C0ABCDE1234",
+    "slack_thread_ts": "1731492920.123456"
+  },
+  "analysis": {
+    "functional_requirements": [
+      {
+        "id": "FR-001",
+        "description": "客戶資料管理：新增、編輯、刪除客戶資料",
+        "priority": "P1",
+        "user_story": "As a 業務人員, I want to 管理客戶資料, So that 我可以記錄客戶基本資訊"
+      },
+      {
+        "id": "FR-002",
+        "description": "銷售機會追蹤：建立與追蹤銷售機會",
+        "priority": "P1",
+        "user_story": "As a 業務人員, I want to 追蹤銷售機會, So that 我可以預測業績"
+      },
+      {
+        "id": "FR-003",
+        "description": "行銷自動化：自動發送 Email 行銷內容",
+        "priority": "P2",
+        "user_story": "As a 行銷人員, I want to 自動發送行銷郵件, So that 節省人工作業時間"
+      },
+      {
+        "id": "FR-004",
+        "description": "報表儀表板：查看銷售漏斗與業務績效",
+        "priority": "P1",
+        "user_story": "As a 主管, I want to 查看銷售報表, So that 掌握團隊績效"
+      },
+      {
+        "id": "FR-005",
+        "description": "權限管理：設定不同角色的存取權限",
+        "priority": "P2",
+        "user_story": "As a 系統管理員, I want to 管理使用者權限, So that 保護客戶資料安全"
+      }
+    ],
+    "non_functional_requirements": [
+      {
+        "id": "NFR-001",
+        "category": "效能",
+        "description": "客戶列表載入時間 < 2 秒"
+      },
+      {
+        "id": "NFR-002",
+        "category": "安全性",
+        "description": "使用 JWT 認證與 bcrypt 密碼加密"
+      },
+      {
+        "id": "NFR-003",
+        "category": "可用性",
+        "description": "系統正常運行時間 > 99.5%"
+      }
+    ],
+    "constraints": [
+      {
+        "type": "技術限制",
+        "description": "前端支援 Chrome、Firefox、Safari 最新版本"
+      },
+      {
+        "type": "技術限制",
+        "description": "後端使用 RESTful API 架構"
+      },
+      {
+        "type": "時程限制",
+        "description": "MVP 版本 3 個月內完成"
+      },
+      {
+        "type": "預算限制",
+        "description": "開發預算 ≤ NT$ 500,000"
+      }
+    ],
+    "key_scenarios": [
+      {
+        "scenario_name": "業務新增客戶",
+        "actors": [
+          "業務人員"
+        ],
+        "steps": [
+          "登入系統",
+          "點擊「新增客戶」按鈕",
+          "填寫客戶資料",
+          "確認新增成功"
+        ]
+      },
+      {
+        "scenario_name": "主管查看報表",
+        "actors": [
+          "主管"
+        ],
+        "steps": [
+          "登入系統",
+          "進入報表儀表板",
+          "查看銷售漏斗與績效排名"
+        ]
+      }
+    ]
+  },
+  "speckit_commands": [
+    "/speckit.specify",
+    "/speckit.plan",
+    "/speckit.tasks"
+  ],
+  "estimated_complexity": "中",
+  "suggested_reviewers": [
+    "@team-sa",
+    "@team-architect"
+  ]
+}

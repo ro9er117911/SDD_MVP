@@ -1,0 +1,122 @@
+{
+  "correlation_id": "req-20251113-101520-abc",
+  "status": "success",
+  "execution_time_seconds": 142,
+  "outputs": {
+    "spec_md": {
+      "path": "specs/001-spec-bot-sdd-integration/spec.md",
+      "size_bytes": 15234,
+      "checksum": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    },
+    "plan_md": {
+      "path": "specs/001-spec-bot-sdd-integration/plan.md",
+      "size_bytes": 28901,
+      "checksum": "sha256:5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    },
+    "tasks_md": {
+      "path": "specs/001-spec-bot-sdd-integration/tasks.md",
+      "size_bytes": 12456,
+      "checksum": "sha256:a3e49d7aad5d8a8d8e8f45f5e5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f"
+    },
+    "diagrams": [
+      {
+        "path": "specs/001-spec-bot-sdd-integration/diagrams/architecture.mermaid",
+        "type": "mermaid",
+        "size_bytes": 2345
+      },
+      {
+        "path": "specs/001-spec-bot-sdd-integration/diagrams/data-model.mermaid",
+        "type": "mermaid",
+        "size_bytes": 1876
+      }
+    ]
+  },
+  "git_operations": {
+    "branch": "bot/spec-1731491400",
+    "commit_sha": "a1b2c3d4e5f6",
+    "commit_message": "feat: 新增客戶管理系統 SDD\n\n由 GPT-5 nano 協調，Claude CLI 產生\nCorrelation ID: req-20251113-101520-abc",
+    "push_status": "success",
+    "pr_url": "https://github.com/your-org/spec-bot/pull/123"
+  },
+  "logs": [
+    {
+      "level": "INFO",
+      "message": "開始處理請求",
+      "timestamp": "2025-11-13T10:15:20Z",
+      "component": "orchestrator",
+      "context": {
+        "correlation_id": "req-20251113-101520-abc"
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "初始化 Git repository",
+      "timestamp": "2025-11-13T10:15:25Z",
+      "component": "git-manager"
+    },
+    {
+      "level": "INFO",
+      "message": "執行 /speckit.specify",
+      "timestamp": "2025-11-13T10:15:30Z",
+      "component": "claude-cli"
+    },
+    {
+      "level": "INFO",
+      "message": "spec.md 產生完成",
+      "timestamp": "2025-11-13T10:16:45Z",
+      "component": "claude-cli",
+      "context": {
+        "file_path": "specs/001-spec-bot-sdd-integration/spec.md",
+        "size_bytes": 15234
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "執行 /speckit.plan",
+      "timestamp": "2025-11-13T10:16:50Z",
+      "component": "claude-cli"
+    },
+    {
+      "level": "INFO",
+      "message": "plan.md 產生完成",
+      "timestamp": "2025-11-13T10:17:30Z",
+      "component": "claude-cli"
+    },
+    {
+      "level": "INFO",
+      "message": "執行 /speckit.tasks",
+      "timestamp": "2025-11-13T10:17:35Z",
+      "component": "claude-cli"
+    },
+    {
+      "level": "INFO",
+      "message": "tasks.md 產生完成",
+      "timestamp": "2025-11-13T10:17:55Z",
+      "component": "claude-cli"
+    },
+    {
+      "level": "INFO",
+      "message": "Commit 提交成功",
+      "timestamp": "2025-11-13T10:18:00Z",
+      "component": "git-manager",
+      "context": {
+        "commit_sha": "a1b2c3d4e5f6"
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "Pull Request 建立成功",
+      "timestamp": "2025-11-13T10:18:10Z",
+      "component": "github-api",
+      "context": {
+        "pr_url": "https://github.com/your-org/spec-bot/pull/123"
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "處理完成",
+      "timestamp": "2025-11-13T10:18:12Z",
+      "component": "orchestrator"
+    }
+  ]
+}

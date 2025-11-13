@@ -1,0 +1,247 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/spec-bot/schemas/brd_analysis.json",
+  "title": "BRD Analysis Schema",
+  "description": "GPT-5 nano 產生的 BRD 分析結果，作為 Docker 容器輸入",
+  "type": "object",
+  "required": [
+    "correlation_id",
+    "timestamp",
+    "brd_content",
+    "analysis",
+    "speckit_commands"
+  ],
+  "properties": {
+    "correlation_id": {
+      "type": "string",
+      "description": "請求唯一識別碼",
+      "pattern": "^req-[a-zA-Z0-9-]+$",
+      "examples": [
+        "req-abc-123-xyz",
+        "req-20251113-101520"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "BRD 分析時間戳記（ISO 8601 格式）",
+      "format": "date-time",
+      "examples": [
+        "2025-11-13T10:15:20Z"
+      ]
+    },
+    "brd_content": {
+      "type": "string",
+      "description": "原始 BRD 內容（Markdown 格式）",
+      "minLength": 100,
+      "maxLength": 102400
+    },
+    "brd_metadata": {
+      "type": "object",
+      "description": "BRD 檔案元資料",
+      "properties": {
+        "file_name": {
+          "type": "string",
+          "description": "BRD 檔案名稱"
+        },
+        "file_size_bytes": {
+          "type": "integer",
+          "description": "檔案大小（bytes）",
+          "minimum": 0
+        },
+        "uploaded_by": {
+          "type": "string",
+          "description": "上傳者 Slack User ID"
+        },
+        "slack_channel": {
+          "type": "string",
+          "description": "上傳的 Slack 頻道 ID"
+        },
+        "slack_thread_ts": {
+          "type": "string",
+          "description": "Slack thread timestamp"
+        }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "description": "GPT-5 nano 分析結果",
+      "required": [
+        "functional_requirements",
+        "non_functional_requirements",
+        "constraints"
+      ],
+      "properties": {
+        "functional_requirements": {
+          "type": "array",
+          "description": "功能需求清單",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "description",
+              "priority"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "需求編號",
+                "pattern": "^FR-\\d{3}$",
+                "examples": [
+                  "FR-001",
+                  "FR-002"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "description": "需求描述",
+                "minLength": 10
+              },
+              "priority": {
+                "type": "string",
+                "description": "優先級",
+                "enum": [
+                  "P1",
+                  "P2",
+                  "P3"
+                ]
+              },
+              "user_story": {
+                "type": "string",
+                "description": "使用者故事（選填）"
+              }
+            }
+          }
+        },
+        "non_functional_requirements": {
+          "type": "array",
+          "description": "非功能需求清單",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "category",
+              "description"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "需求編號",
+                "pattern": "^NFR-\\d{3}$"
+              },
+              "category": {
+                "type": "string",
+                "description": "需求類別",
+                "enum": [
+                  "效能",
+                  "安全性",
+                  "可用性",
+                  "擴展性",
+                  "維護性",
+                  "相容性"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "description": "需求描述",
+                "minLength": 10
+              }
+            }
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "description": "限制條件清單",
+          "items": {
+            "type": "object",
+            "required": [
+              "type",
+              "description"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "限制類型",
+                "enum": [
+                  "技術限制",
+                  "資源限制",
+                  "時程限制",
+                  "法規限制",
+                  "預算限制"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "description": "限制描述"
+              }
+            }
+          }
+        },
+        "key_scenarios": {
+          "type": "array",
+          "description": "關鍵使用場景",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenario_name": {
+                "type": "string"
+              },
+              "actors": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "speckit_commands": {
+      "type": "array",
+      "description": "建議執行的 SpecKit 指令清單",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "/speckit.specify",
+          "/speckit.clarify",
+          "/speckit.plan",
+          "/speckit.tasks",
+          "/speckit.implement",
+          "/speckit.analyze",
+          "/speckit.checklist"
+        ]
+      },
+      "examples": [
+        [
+          "/speckit.specify",
+          "/speckit.plan",
+          "/speckit.tasks"
+        ]
+      ]
+    },
+    "estimated_complexity": {
+      "type": "string",
+      "description": "預估複雜度（選填）",
+      "enum": [
+        "低",
+        "中",
+        "高"
+      ]
+    },
+    "suggested_reviewers": {
+      "type": "array",
+      "description": "建議審核者（選填）",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
