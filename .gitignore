@@ -1,0 +1,44 @@
+# Generated output files (build artifacts)
+output/
+*.docx
+*.pdf
+*.pptx
+
+# Node modules
+node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Office temporary files
+~$*
+*.tmp
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs (optional - remove # to track work-logs)
+# work-logs/
+
+# Environment
+.env
+.env.local
+.env.*.local
