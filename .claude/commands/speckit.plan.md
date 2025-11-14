@@ -1,81 +1,56 @@
 ---
-description: Execute the implementation planning workflow using the plan template to generate design artifacts.
+description: 使用 plan 模板執行實作規劃工作流程，以生成設計產物。
 ---
 
-## User Input
+## 使用者輸入
 
 ```text
 $ARGUMENTS
 ```
 
-You **MUST** consider the user input before proceeding (if not empty).
+**必須**考慮使用者輸入（若非空）。
 
-## Outline
+## 大綱
 
-1. **Setup**: Run `.specify/scripts/bash/setup-plan.sh --json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. **設定**：執行 `.specify/scripts/bash/setup-plan.sh --json`（一次），解析 JSON 取得 `FEATURE_SPEC`、`IMPL_PLAN`、`SPECS_DIR`、`BRANCH`。注意單引號逃脫樣例。
 
-2. **Load context**: Read FEATURE_SPEC and `.specify/memory/constitution.md`. Load IMPL_PLAN template (already copied).
+2. **載入上下文**：讀取 `FEATURE_SPEC` 與 `.specify/memory/constitution.md`。載入 `IMPL_PLAN` 模板（已 copy）。
 
-3. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
-   - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
-   - Fill Constitution Check section from constitution
-   - Evaluate gates (ERROR if violations unjustified)
-   - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION)
-   - Phase 1: Generate data-model.md, contracts/, quickstart.md
-   - Phase 1: Update agent context by running the agent script
-   - Re-evaluate Constitution Check post-design
+3. **執行計畫工作流程**：依 `IMPL_PLAN` 模板結構：
+   - 填入技術上下文（未明事項標註 "NEEDS CLARIFICATION"）  
+   - 填入憲法檢查段（由 constitution 得出）  
+   - 評估門檻（若違規則 ERROR）  
+   - Phase 0：產出 research.md（解決所有 NEEDS CLARIFICATION）  
+   - Phase 1：產出 data-model.md、contracts/、quickstart.md 等  
+   - Phase 1：透過 agent script 更新 agent context  
+   - 設計完成後重新評估 Constitution Check
 
-4. **Stop and report**: Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generated artifacts.
+4. **停止並回報**：命令在 Phase 2 planning 後結束。回報 branch、IMPL_PLAN 路徑與已產生的 artifact。
 
-## Phases
+## 階段說明
 
-### Phase 0: Outline & Research
+### Phase 0：輪廓與研究
 
-1. **Extract unknowns from Technical Context** above:
-   - For each NEEDS CLARIFICATION → research task
-   - For each dependency → best practices task
-   - For each integration → patterns task
+1. 從技術上下文抽出 unknowns：為每個 NEEDS CLARIFICATION 建立研究任務。  
+2. 產出研究代理任務（每個 unknown 及 technology choice 分別建立研究任務）。  
+3. 將結果整合於 `research.md`，格式：
+   - Decision: [選擇]  
+   - Rationale: [選擇理由]  
+   - Alternatives considered: [其他可行方案]
 
-2. **Generate and dispatch research agents**:
+**輸出**：research.md，解決所有 NEEDS CLARIFICATION
 
-   ```text
-   For each unknown in Technical Context:
-     Task: "Research {unknown} for {feature context}"
-   For each technology choice:
-     Task: "Find best practices for {tech} in {domain}"
-   ```
+### Phase 1：設計與契約
 
-3. **Consolidate findings** in `research.md` using format:
-   - Decision: [what was chosen]
-   - Rationale: [why chosen]
-   - Alternatives considered: [what else evaluated]
+**先決條件**：`research.md` 完成
 
-**Output**: research.md with all NEEDS CLARIFICATION resolved
+1. 從 feature spec 擷取實體 → 產出 `data-model.md`：實體名稱、欄位、關聯、驗證規則、狀態轉換。  
+2. 從功能需求產出 API contracts（REST/GraphQL），輸出到 `/contracts/`（OpenAPI / GraphQL schema）。  
+3. 更新 Agent context（呼叫腳本示例 `.specify/scripts/bash/update-agent-context.sh claude`）以同步 agent-specific context file。
 
-### Phase 1: Design & Contracts
+**輸出**：`data-model.md`、`/contracts/*`、`quickstart.md`、agent-specific file
 
-**Prerequisites:** `research.md` complete
+## 主要規則
 
-1. **Extract entities from feature spec** → `data-model.md`:
-   - Entity name, fields, relationships
-   - Validation rules from requirements
-   - State transitions if applicable
-
-2. **Generate API contracts** from functional requirements:
-   - For each user action → endpoint
-   - Use standard REST/GraphQL patterns
-   - Output OpenAPI/GraphQL schema to `/contracts/`
-
-3. **Agent context update**:
-   - Run `.specify/scripts/bash/update-agent-context.sh claude`
-   - These scripts detect which AI agent is in use
-   - Update the appropriate agent-specific context file
-   - Add only new technology from current plan
-   - Preserve manual additions between markers
-
-**Output**: data-model.md, /contracts/*, quickstart.md, agent-specific file
-
-## Key rules
-
-- Use absolute paths
-- ERROR on gate failures or unresolved clarifications
+- 使用絕對路徑。  
+- 若有 gate 失敗或未解決的釐清事項，回報 ERROR 並停止。
