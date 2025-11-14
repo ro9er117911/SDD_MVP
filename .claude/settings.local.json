@@ -2,7 +2,16 @@
   "permissions": {
     "allow": [
       "Bash(tree:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Skill(document-skills:docx)",
+      "Bash(node /Users/ro9air/SDD_repo/generate-docx.js:*)",
+      "Bash(npm install:*)",
+      "Skill(document-skills:pdf)",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Skill(document-skills:pptx)",
+      "Bash(fc-list:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
