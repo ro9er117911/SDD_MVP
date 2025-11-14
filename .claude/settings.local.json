@@ -1,17 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git init:*)",
-      "Bash(git remote add:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(bash:*)",
-      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
-      "Bash(.specify/scripts/bash/setup-plan.sh:*)",
-      "Bash(test:*)",
-      "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
-      "WebSearch"
+      "Bash(tree:*)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []
