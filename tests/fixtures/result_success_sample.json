@@ -1,0 +1,117 @@
+{
+  "correlation_id": "req-20251113-143022",
+  "status": "success",
+  "execution_time_seconds": 142,
+  "outputs": {
+    "spec_md": {
+      "path": "specs/001-spec-bot-sdd-integration/spec.md",
+      "size_bytes": 15234,
+      "checksum": "sha256:a1b2c3d4e5f6789012345678901234567890123456789012345678901234abcd"
+    },
+    "plan_md": {
+      "path": "specs/001-spec-bot-sdd-integration/plan.md",
+      "size_bytes": 28901,
+      "checksum": "sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+    },
+    "tasks_md": {
+      "path": "specs/001-spec-bot-sdd-integration/tasks.md",
+      "size_bytes": 12456,
+      "checksum": "sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+    }
+  },
+  "git_operations": {
+    "branch": "bot/spec-20251113-143022",
+    "commit_sha": "a1b2c3d4e5f6",
+    "commit_message": "feat: 新增 Spec Bot SDD 文件\n\n由 GPT-5 nano 協調,Claude CLI 產生\nCorrelation ID: req-20251113-143022\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "push_status": "success",
+    "pr_url": "https://github.com/your-org/spec-bot/pull/123"
+  },
+  "logs": [
+    {
+      "level": "INFO",
+      "message": "開始執行 /speckit.specify",
+      "timestamp": "2025-11-13T14:30:25Z",
+      "context": {
+        "command": "/speckit.specify",
+        "input_file": "/input/brd_analysis.json"
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "spec.md 產生完成",
+      "timestamp": "2025-11-13T14:31:20Z",
+      "context": {
+        "output_file": "specs/001-spec-bot-sdd-integration/spec.md",
+        "file_size": 15234
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "開始執行 /speckit.plan",
+      "timestamp": "2025-11-13T14:31:22Z",
+      "context": {
+        "command": "/speckit.plan"
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "plan.md 產生完成",
+      "timestamp": "2025-11-13T14:32:05Z",
+      "context": {
+        "output_file": "specs/001-spec-bot-sdd-integration/plan.md",
+        "file_size": 28901
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "開始執行 /speckit.tasks",
+      "timestamp": "2025-11-13T14:32:07Z",
+      "context": {
+        "command": "/speckit.tasks --mode tdd --no-parallel"
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "tasks.md 產生完成",
+      "timestamp": "2025-11-13T14:32:35Z",
+      "context": {
+        "output_file": "specs/001-spec-bot-sdd-integration/tasks.md",
+        "file_size": 12456
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "Git 分支建立成功",
+      "timestamp": "2025-11-13T14:32:40Z",
+      "context": {
+        "branch": "bot/spec-20251113-143022"
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "Git commit 提交成功",
+      "timestamp": "2025-11-13T14:32:42Z",
+      "context": {
+        "commit_sha": "a1b2c3d4e5f6"
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "Git push 成功",
+      "timestamp": "2025-11-13T14:32:45Z",
+      "context": {
+        "branch": "bot/spec-20251113-143022",
+        "remote": "origin"
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "GitHub PR 建立成功",
+      "timestamp": "2025-11-13T14:32:47Z",
+      "context": {
+        "pr_number": 123,
+        "pr_url": "https://github.com/your-org/spec-bot/pull/123"
+      }
+    }
+  ]
+}

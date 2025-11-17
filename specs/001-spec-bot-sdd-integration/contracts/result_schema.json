@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Result Schema",
+  "description": "Docker 容器執行完成後的輸出格式,回傳給 GPT-5 nano 協調層",
+  "type": "object",
+  "required": ["correlation_id", "status", "execution_time_seconds", "logs"],
+  "properties": {
+    "correlation_id": {
+      "type": "string",
+      "pattern": "^req-[a-zA-Z0-9-]+$",
+      "description": "與 brd_analysis.json 相同的追蹤 ID"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "error"],
+      "description": "執行狀態: success(成功) 或 error(失敗)"
+    },
+    "execution_time_seconds": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 600,
+      "description": "執行時間(秒),最長 10 分鐘"
+    },
+    "outputs": {
+      "type": "object",
+      "description": "成功時產生的輸出檔案清單",
+      "properties": {
+        "spec_md": {
+          "type": "object",
+          "required": ["path", "size_bytes", "checksum"],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "spec.md 檔案路徑"
+            },
+            "size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "checksum": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "description": "SHA256 檢查碼"
+            }
+          }
+        },
+        "plan_md": {
+          "type": "object",
+          "required": ["path", "size_bytes", "checksum"],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "plan.md 檔案路徑"
+            },
+            "size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "checksum": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            }
+          }
+        },
+        "tasks_md": {
+          "type": "object",
+          "required": ["path", "size_bytes", "checksum"],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "tasks.md 檔案路徑"
+            },
+            "size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "checksum": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "git_operations": {
+      "type": "object",
+      "description": "Git 操作結果(成功時必填)",
+      "required": ["branch", "commit_sha", "commit_message", "push_status", "pr_url"],
+      "properties": {
+        "branch": {
+          "type": "string",
+          "pattern": "^bot/spec-\\d{8}-\\d{6}$",
+          "description": "分支名稱,格式: bot/spec-YYYYMMDD-HHmmss"
+        },
+        "commit_sha": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{6,40}$",
+          "description": "Commit SHA (短格式 6 位或完整 40 位)"
+        },
+        "commit_message": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Commit 訊息"
+        },
+        "push_status": {
+          "type": "string",
+          "enum": ["success", "failed"],
+          "description": "推送狀態"
+        },
+        "pr_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://github\\.com/",
+          "description": "GitHub PR URL"
+        }
+      }
+    },
+    "error_type": {
+      "type": "string",
+      "enum": [
+        "SPECKIT_EXECUTION_ERROR",
+        "GIT_ERROR",
+        "VALIDATION_ERROR",
+        "DOCKER_ERROR",
+        "GITHUB_API_ERROR",
+        "TIMEOUT_ERROR"
+      ],
+      "description": "錯誤類型(僅在 status=error 時存在)"
+    },
+    "error_message": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "description": "錯誤訊息(僅在 status=error 時存在)"
+    },
+    "stack_trace": {
+      "type": "string",
+      "description": "堆疊追蹤(可選,用於除錯)"
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["level", "message", "timestamp"],
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+            "description": "日誌等級"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "description": "日誌訊息"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "日誌時間戳記"
+          },
+          "context": {
+            "type": "object",
+            "description": "額外上下文資訊"
+          }
+        }
+      },
+      "description": "執行日誌清單"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "success"
+          }
+        }
+      },
+      "then": {
+        "required": ["outputs", "git_operations"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "error"
+          }
+        }
+      },
+      "then": {
+        "required": ["error_type", "error_message"]
+      }
+    }
+  ],
+  "additionalProperties": false
+}

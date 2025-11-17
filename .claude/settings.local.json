@@ -11,7 +11,8 @@
       "Bash(.specify/scripts/bash/setup-plan.sh:*)",
       "Bash(test:*)",
       "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

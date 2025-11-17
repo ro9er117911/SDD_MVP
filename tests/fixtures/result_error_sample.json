@@ -1,0 +1,55 @@
+{
+  "correlation_id": "req-20251113-150500",
+  "status": "error",
+  "execution_time_seconds": 45,
+  "error_type": "SPECKIT_EXECUTION_ERROR",
+  "error_message": "/speckit.specify 執行失敗: Missing 'functional_requirements' in brd_analysis.json",
+  "stack_trace": "Traceback (most recent call last):\n  File \"/workspace/run_speckit.sh\", line 42, in execute_speckit\n    claude-cli execute \"/speckit.specify --input /input/brd_analysis.json\"\n  File \"/usr/local/bin/claude-cli\", line 156, in execute\n    raise SpecKitExecutionError(\"Missing required field: functional_requirements\")\nSpecKitExecutionError: Missing 'functional_requirements' in brd_analysis.json",
+  "logs": [
+    {
+      "level": "INFO",
+      "message": "開始執行 /speckit.specify",
+      "timestamp": "2025-11-13T15:05:05Z",
+      "context": {
+        "command": "/speckit.specify",
+        "input_file": "/input/brd_analysis.json"
+      }
+    },
+    {
+      "level": "ERROR",
+      "message": "brd_analysis.json 格式驗證失敗",
+      "timestamp": "2025-11-13T15:05:08Z",
+      "context": {
+        "validation_error": "Missing required field: analysis.functional_requirements"
+      }
+    },
+    {
+      "level": "ERROR",
+      "message": "/speckit.specify 執行失敗",
+      "timestamp": "2025-11-13T15:05:10Z",
+      "context": {
+        "command": "/speckit.specify",
+        "exit_code": 1,
+        "error": "Missing 'functional_requirements' in brd_analysis.json"
+      }
+    },
+    {
+      "level": "WARNING",
+      "message": "容器執行提前終止",
+      "timestamp": "2025-11-13T15:05:15Z",
+      "context": {
+        "reason": "SpecKit execution failed",
+        "execution_time_seconds": 45
+      }
+    },
+    {
+      "level": "INFO",
+      "message": "寫入 result.json",
+      "timestamp": "2025-11-13T15:05:20Z",
+      "context": {
+        "status": "error",
+        "output_file": "/output/result.json"
+      }
+    }
+  ]
+}

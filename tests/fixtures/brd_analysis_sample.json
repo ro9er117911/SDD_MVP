@@ -1,0 +1,75 @@
+{
+  "correlation_id": "req-20251113-143022",
+  "timestamp": "2025-11-13T14:30:22Z",
+  "brd_metadata": {
+    "file_name": "新功能_BRD.md",
+    "file_size_bytes": 8192,
+    "slack_channel": "C12345678AB",
+    "slack_user": "U12345678AB"
+  },
+  "brd_content": "# 新功能 BRD\n\n## 需求概述\n\nSpec Bot 是一個自動化工具,透過 Slack、GitHub 與 GPT-5 nano 的整合,實現 BRD (Business Requirements Document) 到 SDD (System Design Document) 的自動轉換。\n\n## 功能需求\n\n### FR-001: PM 上傳 BRD 觸發自動化流程\nPM 可以在 Slack 頻道上傳 BRD Markdown 檔案,並透過 @Spec Bot mention 觸發自動化流程。\n\n### FR-002: 自動生成 SDD 文件\n系統自動產生 spec.md, plan.md, tasks.md 三個核心文件。\n\n### FR-003: GitHub PR 自動建立\n系統自動建立 GitHub Pull Request,包含所有 SDD 產出。\n\n### FR-004: Slack 通知機制\n系統透過 Slack 發送處理狀態通知,包含成功與錯誤訊息。\n\n### FR-005: 佇列管理機制\n系統支援最多 5 個並行請求,超過則進入佇列等待。\n\n## 非功能需求\n\n### NFR-001: 效能需求\n- Slack 初步回應延遲 < 5 秒\n- BRD → SDD 完整流程 < 3 分鐘 (P95)\n\n### NFR-002: 安全性需求\n- Docker 容器隔離執行\n- Secrets 透過環境變數注入\n- 日誌中不記錄 PII 或 secrets\n\n### NFR-003: 品質需求\n- 測試覆蓋率 ≥ 80%\n- 所有 Mermaid 圖表必須通過語法驗證\n\n## 技術約束\n\n- 必須使用 Docker 容器隔離執行環境\n- 所有操作需結構化日誌記錄\n- SDD 必須為繁體中文\n- GitHub 為唯一權威事實來源\n\n## 使用者場景\n\n**場景 1: PM 上傳 BRD**\n- Given: PM 在 Slack 頻道上傳 BRD 檔案\n- When: PM mention @Spec Bot 並輸入「請生成 SDD」\n- Then: Bot 在 30 秒內回應「✅ 已收到 BRD,開始處理」\n\n**場景 2: 自動生成 SDD**\n- Given: Bot 已收到 BRD\n- When: Docker 容器執行 SpecKit 指令\n- Then: GitHub PR 建立,包含 spec.md, plan.md, tasks.md\n\n**場景 3: 審核者審核 SDD**\n- Given: GitHub PR 已建立\n- When: SA/Architect 在 GitHub 審核\n- Then: 可以留言、Request Changes、Approve\n\n**場景 4: 合併後自動產出交付物**\n- Given: PR 已合併至 main\n- When: GitHub Actions 觸發\n- Then: 產生 PNG, PDF, DOCX,建立 Release\n\n**場景 5: 錯誤處理與日誌追蹤**\n- Given: 任何錯誤發生\n- When: 系統捕捉錯誤\n- Then: Slack 錯誤通知,日誌記錄,提供疑難排解步驟",
+  "analysis": {
+    "functional_requirements": [
+      {
+        "id": "FR-001",
+        "description": "PM 可透過 Slack 上傳 BRD 觸發自動化流程",
+        "priority": "P1"
+      },
+      {
+        "id": "FR-002",
+        "description": "系統自動產生 spec.md, plan.md, tasks.md",
+        "priority": "P1"
+      },
+      {
+        "id": "FR-003",
+        "description": "系統自動建立 GitHub Pull Request",
+        "priority": "P1"
+      },
+      {
+        "id": "FR-004",
+        "description": "系統透過 Slack 發送處理狀態通知",
+        "priority": "P1"
+      },
+      {
+        "id": "FR-005",
+        "description": "系統支援最多 5 個並行請求與佇列管理",
+        "priority": "P2"
+      }
+    ],
+    "non_functional_requirements": [
+      {
+        "category": "Performance",
+        "requirement": "Slack 初步回應延遲 < 5 秒,完整流程 < 3 分鐘"
+      },
+      {
+        "category": "Security",
+        "requirement": "Docker 隔離、Secrets 透過環境變數注入、無 PII 洩漏"
+      },
+      {
+        "category": "Quality",
+        "requirement": "測試覆蓋率 ≥ 80%,Mermaid 圖表語法驗證"
+      }
+    ],
+    "constraints": [
+      "使用 Docker 隔離執行環境",
+      "所有操作需結構化日誌記錄",
+      "繁體中文 SDD",
+      "GitHub 為唯一權威事實來源"
+    ],
+    "suggested_architecture": {
+      "system_type": "Backend Service + Slack Bot + Docker Orchestration",
+      "deployment": "Docker Container",
+      "data_storage": "GitHub Repository"
+    }
+  },
+  "speckit_commands": [
+    "/speckit.specify",
+    "/speckit.plan",
+    "/speckit.tasks --mode tdd --no-parallel"
+  ],
+  "execution_context": {
+    "github_repo": "your-org/spec-bot",
+    "target_branch": "main",
+    "feature_branch_prefix": "bot/spec"
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BRD Analysis Schema",
+  "description": "GPT-5 nano 產生的 BRD 分析結果,傳遞給 Docker 容器的輸入格式",
+  "type": "object",
+  "required": [
+    "correlation_id",
+    "timestamp",
+    "brd_metadata",
+    "brd_content",
+    "analysis",
+    "speckit_commands",
+    "execution_context"
+  ],
+  "properties": {
+    "correlation_id": {
+      "type": "string",
+      "pattern": "^req-[a-zA-Z0-9-]+$",
+      "description": "唯一追蹤 ID,格式: req-{timestamp}-{random}"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "分析時間戳記 (ISO 8601 格式)"
+    },
+    "brd_metadata": {
+      "type": "object",
+      "required": ["file_name", "file_size_bytes", "slack_channel", "slack_user"],
+      "properties": {
+        "file_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "description": "BRD 檔案名稱"
+        },
+        "file_size_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 102400,
+          "description": "檔案大小 (bytes),上限 100 KB"
+        },
+        "slack_channel": {
+          "type": "string",
+          "pattern": "^[CG][A-Z0-9]{10}$",
+          "description": "Slack 頻道 ID"
+        },
+        "slack_user": {
+          "type": "string",
+          "pattern": "^U[A-Z0-9]{10}$",
+          "description": "上傳者 Slack 使用者 ID"
+        }
+      }
+    },
+    "brd_content": {
+      "type": "string",
+      "minLength": 100,
+      "maxLength": 102400,
+      "description": "完整 BRD Markdown 內容"
+    },
+    "analysis": {
+      "type": "object",
+      "required": [
+        "functional_requirements",
+        "non_functional_requirements",
+        "constraints"
+      ],
+      "properties": {
+        "functional_requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "description", "priority"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^FR-\\d{3}$",
+                "description": "功能需求編號,格式: FR-001, FR-002, ..."
+              },
+              "description": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 500,
+                "description": "需求描述"
+              },
+              "priority": {
+                "type": "string",
+                "enum": ["P1", "P2", "P3"],
+                "description": "優先級: P1(高), P2(中), P3(低)"
+              }
+            }
+          }
+        },
+        "non_functional_requirements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["category", "requirement"],
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": [
+                  "Performance",
+                  "Security",
+                  "Reliability",
+                  "Scalability",
+                  "Usability",
+                  "Maintainability",
+                  "Quality"
+                ],
+                "description": "非功能需求類別"
+              },
+              "requirement": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 300,
+                "description": "需求描述"
+              }
+            }
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 200
+          },
+          "description": "技術約束條件清單"
+        },
+        "suggested_architecture": {
+          "type": "object",
+          "properties": {
+            "system_type": {
+              "type": "string",
+              "description": "系統類型,如: Backend Service, Frontend App, etc."
+            },
+            "deployment": {
+              "type": "string",
+              "description": "部署方式,如: Docker Container, Kubernetes, etc."
+            },
+            "data_storage": {
+              "type": "string",
+              "description": "資料儲存方式,如: GitHub Repository, Database, etc."
+            }
+          }
+        }
+      }
+    },
+    "speckit_commands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^/speckit\\.(specify|clarify|plan|tasks|analyze|checklist)",
+        "description": "SpecKit 指令清單"
+      },
+      "description": "建議執行的 SpecKit 指令"
+    },
+    "execution_context": {
+      "type": "object",
+      "required": ["github_repo", "target_branch", "feature_branch_prefix"],
+      "properties": {
+        "github_repo": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$",
+          "description": "GitHub repository,格式: owner/repo-name"
+        },
+        "target_branch": {
+          "type": "string",
+          "minLength": 1,
+          "description": "目標分支,通常為 main 或 master"
+        },
+        "feature_branch_prefix": {
+          "type": "string",
+          "description": "功能分支前綴,如: bot/spec"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
