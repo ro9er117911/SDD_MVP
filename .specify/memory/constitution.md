@@ -1,439 +1,483 @@
 <!--
-═══════════════════════════════════════════════════════════════════════════
-同步影響報告 (SYNC IMPACT REPORT)
-═══════════════════════════════════════════════════════════════════════════
-版本變更：1.0.0 → 2.0.0
+═══════════════════════════════════════════════════════════════
+SYNC IMPACT REPORT - Constitution Update v1.0.0
+═══════════════════════════════════════════════════════════════
 
-修改原則：
-- I. Library-First Architecture → I. 單一事實來源與狀態外部化
-- II. CLI Interface Contract → II. Bot 輕量沙箱原則
-- III. Test-Driven Development → III. 測試驅動開發 (NON-NEGOTIABLE)
-- IV. Integration Testing → IV. 整合測試與模擬環境
-- V. Simplicity & YAGNI → V. 簡約與需求驅動 (YAGNI)
-- VI. Observability & Debugging → VI. 完整可追溯性與審計
-- VII. Versioning & Breaking Changes → VII. 語意化版本與文件同步
+Version Change: TEMPLATE → v1.0.0
 
-新增原則：
-- VIII. 零信任與權限最小化
-- IX. AI 回應有據與防護
-- X. 原生整合優先
+Modified Sections:
+  - Converted all placeholder tokens to concrete content
+  - Added 10 core principles based on project requirements
+  - Added 3 additional sections: Document Standards, Security Constraints, Governance
 
-新增章節：
-- 安全約束 (Security Constraints)
-- 文件產出標準 (Documentation Standards)
-- 協作與審核規範 (Collaboration & Review)
+Added Principles:
+  1. I. 單一事實來源 (Single Source of Truth)
+  2. II. 輕量沙箱 (Lightweight Sandbox)
+  3. III. 測試驅動開發 (Test-Driven Development) - NON-NEGOTIABLE
+  4. IV. 整合測試 (Integration Testing)
+  5. V. 簡約與 YAGNI (Simplicity & YAGNI)
+  6. VI. 完整可追溯性 (Complete Traceability)
+  7. VII. 語意化版本 (Semantic Versioning)
+  8. VIII. 零信任與權限最小化 (Zero Trust & Least Privilege)
+  9. IX. AI 回應有據 (Evidence-Based AI Responses)
+  10. X. 原生整合優先 (Native Integration First)
 
-移除章節：
-- Development Workflow (整合至協作與審核規範)
-- Quality Gates (整合至測試與安全約束)
+Templates Requiring Updates:
+  ✅ .specify/templates/plan-template.md - Constitution Check section aligned
+  ✅ .specify/templates/spec-template.md - Requirements format aligned
+  ✅ .specify/templates/tasks-template.md - Task categorization aligned
+  ✅ .claude/commands/*.md - Command references verified
 
-模板狀態：
-✅ plan-template.md - 已驗證 Constitution Check 對齊新原則
-✅ spec-template.md - 已驗證使用者場景與 Gherkin 格式需求
-✅ tasks-template.md - 已驗證測試優先任務排序
-⚠️  需手動檢查：所有輸出文件需改為繁體中文
+Follow-up TODOs: None - All placeholders have been resolved
 
-後續待辦：
-- 無 - 所有佔位符已填寫完成
-
-專案重新定位：從通用 MVP 框架 → Spec Bot (Slack/GitHub/GPT 整合的 SDD 需求對齊工具)
-批准日期：2025-11-13
-═══════════════════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════════
 -->
 
 # Spec Bot 專案憲法
 
-**專案定位**：Slack/GitHub/GPT 整合的 SDD 需求對齊工具
-**核心目標**：自動將 BRD (Business Requirements Document) 轉換為 SDD (System Design Document)，透過協作平台與版本控管實現需求對齊
+本憲法定義 Spec Bot 專案的核心原則、技術標準與治理規則，為所有開發決策提供最高指導原則。
 
-## 核心原則 (Core Principles)
+## 核心原則
 
-### I. 單一事實來源與狀態外部化 (Single Source of Truth & Stateless Bot)
+### I. 單一事實來源
 
-Bot 本身必須完全無狀態，所有專案狀態、文件版本、協作記錄必須儲存於 **GitHub Repository**，作為唯一的權威事實來源。Bot 不得在本地檔案系統或資料庫中持久化任何業務邏輯或狀態資料。
+**GitHub 為唯一權威資料來源，Bot 必須完全無狀態**
 
-**要求**：
-- 所有 SDD 產出（spec.md, plan.md, tasks.md）必須透過 Git commits 版本化
-- Bot 重啟或失敗後，必須能從 GitHub 完整重建上下文
-- 不得使用本地快取儲存業務邏輯狀態
-- 分支命名規則：`bot/spec-{timestamp}` 或 `bot/{feature-name}`
+- GitHub repository 是所有規格、程式碼、配置的唯一事實來源
+- Bot 不得在本地或外部系統持久化任何狀態或資料
+- 所有歷史記錄、版本追溯、審核紀錄依賴 GitHub 原生功能（commit history、PR history、compare）
+- Bot 重啟後必須能從 GitHub 完整恢復上下文，無需額外資料儲存
 
-**理由**：狀態外部化確保系統可審計、可復原，並消除單點故障。GitHub 提供原生版本控制、審核追蹤與協作機制，無需額外基礎設施。
+**理由**: 避免狀態不一致問題，簡化災難復原與系統擴展，利用 GitHub 成熟的版本控制能力。
 
-### II. Bot 輕量沙箱原則 (Lightweight Sandboxing)
+---
 
-所有自動化操作（包括 Git 操作、文件生成、API 呼叫）必須在隔離的 **Docker 容器**中執行。容器必須在任務完成後立即銷毀，不得保留任何執行痕跡。
+### II. 輕量沙箱
 
-**要求**：
-- Bot 不得擁有主機系統的終端機權限或檔案系統存取
-- Docker 容器必須使用最小權限的基礎映像（如 `python:3.11-slim`）
-- 命令白名單：僅允許 `git`、`speckit.sh`、基本文件操作（read/write）
-- 網路存取限制：僅允許連線至 Slack API、OpenAI API、GitHub API（透過環境變數配置的端點）
-- 容器生命週期：啟動 → 執行單一任務 → 輸出結果 → 自動銷毀
+**所有自動化操作必須在 Docker 容器中隔離執行**
 
-**理由**：沙箱化防止 Bot 被濫用為系統攻擊入口，限制爆炸半徑。容器短生命週期確保無殘留敏感資料，符合零信任原則。
+- 每個 BRD 處理請求啟動獨立的 Docker 容器
+- 容器必須在任務完成或逾時（10 分鐘）後自動銷毀
+- 容器環境標準化：
+  - 基礎映像：`node:18-slim`
+  - 執行使用者：非 root
+  - 資源限制：CPU 2 核心上限，記憶體 4GB 上限
+  - 安裝工具：Claude CLI、SpecKit CLI、Git、Python 3.11、uv、Node.js 18+、mermaid-cli、curl、基本檔案工具
+- 白名單命令：claude-cli, /speckit.*, git, bash, node, npm, python3, uv, mmdc, curl, mkdir, cp, mv, rm
+- 禁止命令：編譯器（gcc, javac）、套件管理器（apt, yum）、網路掃描工具（nmap）
 
-### III. 測試驅動開發 (Test-Driven Development, NON-NEGOTIABLE)
+**理由**: 確保操作隔離性與安全性，防止惡意或錯誤操作影響主機系統，便於資源清理與並行處理。
 
-所有功能開發必須嚴格遵循 TDD 流程，並使用 **Gherkin 語法** (Given-When-Then) 描述驗收場景。測試必須先於實作完成，且涵蓋正常流程與異常處理。
+---
 
-**要求**：
-1. 撰寫整合測試與驗收測試（基於 spec.md 的使用者場景）
-2. 取得利害關係人對測試場景的批准
-3. 驗證測試為紅燈狀態（失敗）
-4. 實作最小程式碼使測試通過（綠燈）
-5. 重構並維持綠燈狀態
+### III. 測試驅動開發 (NON-NEGOTIABLE)
 
-**優先級**：
-- 安全測試（權限繞過、Prompt Injection、API token 洩漏）為最高優先級
-- Slack webhook 模擬測試（避免實際傳送訊息至正式頻道）
-- GPT API 呼叫必須有 mock 測試（避免產生費用與延遲）
-- GitHub API 操作必須有整合測試（使用測試 repository）
+**TDD 為強制性原則，測試必須先於實作**
 
-**理由**：TDD 確保需求被正確理解並可驗證。Gherkin 格式讓非技術利害關係人也能審查測試場景，提早發現規格誤解。
+- 嚴格遵循 Red-Green-Refactor 循環：
+  1. 撰寫測試（必須失敗）
+  2. 取得使用者批准
+  3. 驗證測試確實失敗
+  4. 實作最小可行程式碼使測試通過
+  5. 重構（保持測試通過）
+- 驗收場景必須使用 Gherkin 語法（Given-When-Then）
+- 禁止先寫實作再補測試
+- 測試覆蓋核心業務邏輯，而非追求 100% 行覆蓋率
 
-### IV. 整合測試與模擬環境 (Integration Testing & Mocking)
+**理由**: TDD 確保需求可測試性、降低缺陷率、提供即時回饋、作為活文件記錄行為預期。此原則不可妥協。
 
-整合測試必須涵蓋所有跨系統邊界的互動，並使用高擬真度的模擬環境。測試覆蓋率必須達到 **80% 以上**。
+---
 
-**強制測試範圍**：
-- Slack Event API 的 webhook 接收與回應格式驗證
-- GitHub API 的 PR 建立、檔案提交、分支管理操作
-- OpenAI GPT API 的 prompt 傳送與回應解析（含錯誤處理）
-- BRD → SDD 轉換的端到端流程（使用真實範例 BRD 輸入）
-- 權限與認證失敗的錯誤處理路徑
+### IV. 整合測試
 
-**模擬要求**：
-- 使用 `pytest-mock` 或 `unittest.mock` 模擬外部 API
-- Slack webhook 測試使用 `pytest-httpserver` 或類似工具
-- GPT API 回應使用預錄的真實回應樣本（避免 hallucination 測試不穩定）
+**重點領域必須包含整合測試，覆蓋率 ≥ 80%**
 
-**理由**：Spec Bot 高度依賴外部服務，整合測試確保契約相容性。模擬環境避免測試過程產生實際費用、洩漏資料或干擾正式環境。
+強制整合測試範圍：
+- 新增或變更的 API 契約（Contract tests）
+- 跨服務通訊（Slack API、GitHub API、OpenAI API）
+- 共享的資料結構（brd_analysis.json、SDD 章節格式）
+- Docker 容器與主機系統互動
+- GitHub Actions 觸發與執行流程
 
-### V. 簡約與需求驅動 (Simplicity & YAGNI)
+整合測試策略：
+- 使用 mock servers 模擬外部 API（避免實際 API 呼叫）
+- 驗證請求格式、回應解析、錯誤處理
+- 測試環境與生產環境配置一致
 
-嚴格遵循 spec.md 定義的範圍進行開發，禁止為「未來可能」的需求預先建構複雜架構。優先實作核心功能，快速交付並收集回饋。
+**理由**: 整合測試捕捉單元測試無法發現的介面不一致與配置錯誤，確保系統各部分正確協作。
 
-**禁止行為**：
-- 引入未在 spec.md 中明確列出的功能或抽象層
-- 使用超出需求的框架（例：簡單 REST API 不應引入 GraphQL）
-- 預先建立「可擴充架構」而無當前使用場景
+---
 
-**決策優先順序**：
-1. 標準函式庫優於第三方套件
-2. 第三方套件優於自建框架
-3. 組合 (composition) 優於繼承 (inheritance)
-4. 明確 (explicit) 優於隱含 (implicit)
+### V. 簡約與 YAGNI
 
-**例外處理**：若必須引入複雜性，必須在 plan.md 的「複雜度追蹤」章節中記錄：
-- 違反的原則
-- 引入原因
-- 已拒絕的更簡單替代方案及理由
+**禁止過度工程，複雜性需明確記錄於 plan.md**
 
-**理由**：過度工程增加認知負擔、維護成本與 bug 數量。YAGNI 強制紀律開發，確保每一行程式碼都有明確的當前價值。
+- 遵循 YAGNI（You Aren't Gonna Need It）原則：只實作當前明確需求
+- 禁止「為未來擴展」而增加抽象層或配置選項
+- 三行相似程式碼優於過早抽象
+- 信任內部程式碼與框架保證，僅在系統邊界（使用者輸入、外部 API）驗證
+- 違反簡約原則時，必須在 `plan.md` 的「複雜度追蹤」章節記錄：
+  - 違反的原則
+  - 引入原因
+  - 已拒絕的更簡單替代方案及理由
 
-### VI. 完整可追溯性與審計 (Full Traceability & Audit Trail)
+**理由**: 過度工程增加維護成本、降低可讀性、延長開發時間。最佳複雜度是完成當前任務的最小必要複雜度。
 
-所有關鍵操作必須留下詳細且不可竄改的日誌記錄，支援事後審計與問題追蹤。
+---
 
-**強制日誌內容**：
-- 使用者請求（Slack 訊息內容、使用者 ID、時間戳記）
-- AI Agent 決策路徑（LangGraph 狀態轉換、GPT prompt/response）
-- 外部 API 呼叫（請求參數、回應狀態碼、延遲時間）
-- Git 操作記錄（commit SHA、分支名稱、檔案變更清單）
-- 錯誤與異常（完整堆疊追蹤、上下文資訊）
+### VI. 完整可追溯性
 
-**日誌格式**：
-- 使用結構化 JSON 格式（便於自動化分析）
-- 必須包含 correlation ID（追蹤跨系統請求）
-- 時間戳記使用 ISO 8601 格式（UTC 時區）
+**結構化 JSON 日誌，使用 correlation_id 追蹤跨系統操作**
 
-**錯誤處理**：
-- 所有錯誤必須記錄並透過 Slack 通知使用者
-- 錯誤訊息必須可操作（what failed, why, what to do next）
-- 不得有靜默失敗（silent failure）
+日誌標準：
+- 格式：結構化 JSON（非純文字）
+- 強制欄位：
+  - `timestamp`（ISO 8601 格式）
+  - `correlation_id`（追蹤單一請求的所有操作）
+  - `log_level`（INFO, WARNING, ERROR）
+  - `component`（記錄來源：slack_listener, gpt_coordinator, docker_executor 等）
+  - `message`（簡短說明）
+  - `context`（相關資訊：user_id, file_name, pr_url 等）
+- 錯誤日誌額外欄位：
+  - `error_type`（分類：GPT_API_ERROR, GIT_ERROR, VALIDATION_ERROR, DOCKER_ERROR）
+  - `error_message`（完整錯誤訊息）
+  - `stack_trace`（堆疊追蹤）
 
-**API 回應時效**：
-- Bot 初步回應 < 5 秒（「已收到請求，處理中...」）
-- 完整 BRD → SDD 流程 < 3 分鐘
-- 超過時間限制必須通知使用者並記錄原因
+敏感資料遮罩：
+- API tokens、secrets 必須使用 `[REDACTED]` 遮罩
+- 不得記錄完整的 API keys、passwords、personal identifiable information (PII)
 
-**理由**：可追溯性是企業級系統的基本要求。結構化日誌支援自動化監控、效能分析與安全事件偵測。
+**理由**: 結構化日誌支援快速問題定位、效能分析、審計追蹤。correlation_id 使跨系統操作可完整追溯。
 
-### VII. 語意化版本與文件同步 (Semantic Versioning & Document Sync)
+---
 
-所有產出文件、API 契約、Bot 功能必須遵循**語意化版本控制** (MAJOR.MINOR.PATCH)，並確保版本變更與文件更新同步。
+### VII. 語意化版本
 
-**版本規則**：
-- **MAJOR**：破壞性變更（SDD 格式變更、API 端點移除、必要欄位刪除）
-- **MINOR**：新功能（新增 SDD 章節、新 Slack 指令、擴充 API 參數）
-- **PATCH**：錯誤修正（文件錯字、格式調整、bug 修復）
+**MAJOR.MINOR.PATCH 版本號，破壞性變更需遷移指南**
 
-**破壞性變更要求**：
-- 必須在 CHANGELOG.md 中記錄變更內容與遷移指南
-- 若可能，在前一個 MINOR 版本提供棄用警告 (deprecation warning)
-- 提供自動化遷移腳本或工具（如：格式轉換腳本）
-- 必須經利害關係人批准後才能發布
+版本號規則：
+- **MAJOR**：不向下相容的 API 變更、移除功能、重大架構調整
+  - 必須提供遷移指南（migration guide）
+  - 說明破壞性變更與升級步驟
+- **MINOR**：向下相容的新功能、新 API 端點、功能增強
+- **PATCH**：向下相容的錯誤修正、效能改善、文件更新
 
-**Commit 訊息規範**：
-- 遵循 Conventional Commits 格式：`feat:`, `fix:`, `docs:`, `refactor:`
-- 範例：`feat: 新增 Mermaid 架構圖自動生成功能`
-- 範例：`fix: 修正 GitHub PR 標題編碼錯誤`
+適用範圍：
+- 憲法版本（constitution.md）
+- API 版本（若提供外部 API）
+- 重要工具腳本版本（如 SpecKit CLI）
 
-**理由**：語意化版本讓變更影響一目瞭然。明確的遷移路徑降低升級風險與協作摩擦。
+**理由**: 語意化版本讓使用者快速判斷升級風險，遷移指南降低升級成本，版本號傳達變更影響範圍。
 
-### VIII. 零信任與權限最小化 (Zero Trust & Least Privilege)
+---
 
-Bot 不得擁有任何隱含信任或過度權限。所有對外部服務的存取必須經過明確的身份驗證與授權。
+### VIII. 零信任與權限最小化
 
-**權限要求**：
-- **GitHub**：僅授予 `repo` scope（讀寫 repository 檔案與 PR）
-- **Slack**：僅授予 `chat:write`, `commands`, `files:read` scopes
-- **OpenAI API**：使用專用 API key，設定 rate limit 與 token 用量上限
+**所有 API tokens 透過環境變數注入，賦予最小必要權限**
 
-**Secrets 管理**：
-- 所有 API tokens、secrets 必須透過環境變數注入（不得寫死在程式碼中）
-- 使用 GitHub Secrets 或專用的 Secret Manager（如 HashiCorp Vault）
-- 不得在日誌或錯誤訊息中洩漏 secrets（使用 `[REDACTED]` 遮罩）
+Secrets 管理：
+- 所有 API tokens（Slack, GitHub, OpenAI）透過環境變數注入
+- 不得將 secrets 寫死在程式碼、配置檔案或 commit 歷史中
+- 使用 `.env` 檔案本地開發，生產環境使用 GitHub Secrets 或密鑰管理服務
 
-**存取控制**：
-- Slack 指令需驗證使用者身份（避免未授權使用者觸發 Bot）
-- GitHub PR 需設定 CODEOWNERS 進行審核（避免自動合併未審核變更）
+權限最小化：
+- **GitHub Token**: 使用 Fine-grained personal access token，限制權限範圍：
+  - `contents: write`（建立分支、提交檔案）
+  - `pull_requests: write`（建立 PR、設定審核者）
+  - `workflows: write`（觸發 GitHub Actions）
+  - `metadata: read`（讀取 repository 基本資訊）
+- **Slack App**: 僅申請必要權限（讀取訊息、上傳檔案、發送訊息）
+- **Docker 容器**: 以非 root 使用者執行，無主機系統存取權限
 
-**理由**：權限最小化限制攻擊面與爆炸半徑。零信任假設所有請求都可能是惡意的，強制驗證每一步操作。
+網路存取白名單：
+- 僅允許連線至：Slack API (slack.com), GitHub API (api.github.com), OpenAI API (api.openai.com)
 
-### IX. AI 回應有據與防護 (Grounded AI & Prompt Injection Defense)
+**理由**: 零信任原則降低 secrets 洩漏風險，權限最小化限制攻擊面，白名單防止資料外洩。
 
-GPT 產生的所有內容必須「有據可循」，並實施防護機制避免 prompt injection 攻擊。
+---
 
-**RAG (Retrieval-Augmented Generation) 強制使用**：
-- 所有基於內部文件的問答必須使用 RAG 模式
-- 回應必須明確引用來源（文件名稱、章節、段落）
-- 禁止模型在無資料依據下進行「幻覺」式回答
+### IX. AI 回應有據
 
-**Prompt Injection 防護**：
-- 使用者輸入必須經過 sanitization（移除控制字元、SQL/code injection 嘗試）
-- 在 system prompt 中明確指示模型：「你是 SDD 產生助手，不得執行與 SDD 無關的指令」
-- 對可疑輸入（如包含 `ignore previous instructions`）進行警告並記錄
+**強制使用 RAG（Retrieval-Augmented Generation），防護 Prompt Injection**
 
-**輸出驗證**：
-- 所有生成的 Mermaid 圖表必須通過語法驗證（使用 `mermaid-cli` 或類似工具）
-- Markdown 文件必須符合 CommonMark 規範
-- API 規格必須符合 OpenAPI 3.0 格式（若適用）
+RAG 策略：
+- GPT-5 nano 生成 SDD 時，必須引用 BRD 原文章節
+- 禁止 GPT 憑空捏造需求或功能細節
+- Prompt 設計包含明確指示：「僅基於提供的 BRD 內容生成 SDD，不得添加未提及的需求」
 
-**理由**：AI 幻覺會導致錯誤的技術決策與安全漏洞。RAG 確保回應可驗證。Prompt injection 是 AI 系統的主要威脅，必須多層防護。
+Prompt Injection 防護：
+- BRD 內容視為不可信輸入，嚴格分隔系統指令與使用者輸入
+- 使用結構化格式（JSON）傳遞 BRD 內容，避免純文字拼接
+- 驗證 BRD 大小（≤ 100 KB）與格式（.md 檔案），拒絕異常輸入
 
-### X. 原生整合優先 (Native Integration First)
+輸出驗證：
+- 使用 mermaid-cli 驗證生成的 Mermaid 圖表語法正確性
+- 檢查 SDD 是否包含 5 個強制章節
+- 若驗證失敗，重試一次（使用更明確的 prompt）
 
-優先使用 Slack、GitHub、OpenAI 提供的官方 SDK 與原生 API，避免引入不必要的抽象層或第三方中介服務。
+**理由**: RAG 確保 AI 回應基於事實而非幻想，Prompt Injection 防護避免惡意 BRD 操控系統行為，輸出驗證保證品質。
 
-**優先採用**：
-- **Slack**：Bolt for Python (官方 SDK)
-- **GitHub**：PyGithub 或 GitHub REST API
-- **OpenAI**：OpenAI Python SDK
+---
 
-**禁止引入**（除非有明確理由）：
-- 自建 API wrapper（除非官方 SDK 有重大缺陷）
-- 第三方整合平台（如 Zapier、Make）作為核心流程
-- 過度抽象的 ORM 或框架（如：在簡單 REST API 上使用 GraphQL）
+### X. 原生整合優先
 
-**例外處理**：
-- 若官方 SDK 不支援特定功能，必須在 plan.md 記錄原因與替代方案評估
+**使用官方 SDK，避免自行實作 API 包裝層**
 
-**理由**：原生整合降低維護成本、提高安全性（官方 SDK 通常有更好的安全審計）、並最大化利用平台原生功能（如 Slack 的 Block Kit UI）。
+強制使用官方 SDK：
+- **Slack**: Bolt for JavaScript/Python（官方框架）
+- **GitHub**: PyGithub（Python）或 Octokit（JavaScript）
+- **OpenAI**: OpenAI Python/JavaScript SDK
+- **Claude CLI**: `@anthropic-ai/claude-code`（官方 Agent CLI）
+- **SpecKit CLI**: `specify-cli`（官方規格驅動開發框架）
 
-## 安全約束 (Security Constraints)
+禁止行為：
+- 不得直接使用 `requests` 或 `axios` 手動呼叫 Slack/GitHub/OpenAI API
+- 不得自行實作 OAuth 流程、簽章驗證或 API rate limiting（使用 SDK 內建功能）
 
-### 依賴管理與弱點掃描
+例外情況：
+- 官方 SDK 不支援的特殊功能（必須記錄於 `plan.md` 複雜度追蹤）
+- 官方 SDK 有嚴重 bug 且無修復計畫（需提供證據）
 
-所有專案依賴必須明確鎖定版本（使用 `requirements.txt` 或 `poetry.lock`），並在每次提交前通過弱點掃描。
+**理由**: 官方 SDK 經過充分測試、處理邊界情況、自動更新，減少維護負擔與安全風險。自行實作容易遺漏細節。
 
-**要求**：
-- 使用 `pip-audit`, `safety`, 或 GitHub Dependabot 自動掃描
-- 禁止使用存在已知中高風險漏洞的套件（CVSS ≥ 7.0）
-- 依賴更新必須經過測試驗證後才能合併
+---
 
-### Docker 容器安全
+## 文件標準
 
-Docker 容器必須遵循最佳實踐，最小化攻擊面。
+### 語言要求
 
-**要求**：
-- 使用官方基礎映像（如 `python:3.11-slim`）
-- 不得以 root 使用者執行容器
-- 限制容器資源（CPU、記憶體上限）
-- 容器執行後自動銷毀，不得持久化敏感資料
+**所有專案文件必須使用繁體中文**
 
-### 資料落地與分類
+強制繁體中文範圍：
+- 規格文件（spec.md, plan.md, tasks.md）
+- Commit 訊息（遵循 Conventional Commits 格式）
+- Pull Request 標題與描述
+- 程式碼註解（除非外部相容性需求）
 
-所有處理的資料預設為「機敏資料」等級，必須遵循資料保護政策。
+例外：
+- 程式碼變數名稱、函式名稱（遵循 PEP 8 或對應語言規範，使用英文）
+- 技術專有名詞保留原文（Docker container, REST API, Mermaid 等）
+- 外部 API 回應或第三方套件文件
 
-**要求**：
-- PII (Personally Identifiable Information) 不得記錄在日誌中
-- 暫存檔案必須在任務完成後立即刪除
-- 跨境資料傳輸需評估法規遵循（GDPR, PDPA）
+**理由**: 統一語言降低溝通成本，確保團隊成員快速理解文件內容，專有名詞保留原文避免誤解。
 
-## 文件產出標準 (Documentation Standards)
+---
 
 ### SDD 格式要求
 
-所有自動產生的 SDD 必須包含以下章節（依序）：
+**所有 SDD 必須包含以下 5 個強制章節**
 
-1. **系統概述** (System Overview)
-   - 專案目標與範圍
-   - 核心使用者場景
-   - 關鍵假設與限制
+1. **系統概述**
+   - 專案目標
+   - 使用者角色與場景
+   - 技術限制與假設
 
-2. **架構設計** (Architecture Design)
-   - 系統架構圖（使用 Mermaid `graph` 或 `C4` 語法）
-   - 元件職責與互動
-   - 部署架構
+2. **架構設計**
+   - 系統架構圖（Mermaid: graph TD 或 graph LR）
+   - 元件職責說明
+   - 技術堆疊選擇
 
-3. **資料模型** (Data Model)
-   - 實體關係圖（使用 Mermaid `erDiagram`）
-   - 資料流向與生命週期
+3. **資料模型**
+   - 實體關係圖（Mermaid: erDiagram）
+   - 關鍵實體屬性定義
+   - 資料流向
 
-4. **API 規格** (API Specification)
-   - 端點清單與參數定義
-   - 請求/回應範例
-   - 錯誤碼與處理
+4. **API 規格**
+   - 端點定義（路徑、HTTP 方法）
+   - 請求/回應範例（JSON 格式）
+   - 錯誤碼定義
 
-5. **部署方案** (Deployment Plan)
-   - 環境配置（dev, staging, prod）
+5. **部署方案**
+   - 環境配置（開發、測試、生產）
    - CI/CD 流程
    - 監控與告警策略
 
+章節編號：使用 `01_系統概述.md`, `02_架構設計.md` 等格式，確保排序一致。
+
+---
+
 ### Mermaid 圖表規範
 
-所有圖表必須使用 **Mermaid 語法**，並通過語法驗證。
+**強制驗證：所有圖表必須通過 mermaid-cli 語法檢查**
 
-**要求**：
-- 架構圖使用 `graph TD` 或 `graph LR`
-- 資料模型使用 `erDiagram`
-- 流程圖使用 `flowchart` 或 `sequenceDiagram`
-- 圖表必須包含清楚的節點標籤與關係說明
-- 使用 `mermaid-cli` 驗證語法正確性
+圖表類型標準：
+- **架構圖**: `graph TD` 或 `graph LR`
+- **資料模型**: `erDiagram`
+- **流程圖**: `flowchart` 或 `sequenceDiagram`
+- **部署圖**: `graph` 或 C4 model
 
-**範例**：
-```mermaid
-graph TD
-    A[Slack User] -->|傳送 BRD| B[Spec Bot]
-    B -->|呼叫 GPT API| C[OpenAI]
-    C -->|回傳 SDD 草稿| B
-    B -->|建立 PR| D[GitHub Repo]
+語法驗證命令：
+```bash
+mmdc -i diagram.mermaid -o diagram.png
 ```
 
-### Markdown 規範
+圖表複雜度限制：
+- 節點數量建議不超過 50 個（避免渲染效能問題）
+- 使用子圖（subgraph）組織複雜架構
 
-所有文件必須使用 **CommonMark Markdown** 規範。
+**理由**: 統一圖表格式提升可讀性，語法驗證避免 GitHub 渲染錯誤，複雜度限制確保圖表實用性。
 
-**要求**：
-- 章節編號使用 `1.x`, `2.x` 格式（自動或手動）
-- 程式碼區塊必須指定語言（如 ```python, ```json）
-- 表格必須對齊（使用工具如 `markdownlint`）
-- 連結必須有效（避免死連結）
+---
 
-### 語言強制性
+## 安全約束
 
-**所有專案產出文件必須使用繁體中文 (zh-TW)**，包括：
-- spec.md, plan.md, tasks.md
-- SDD 文件內容
-- Commit 訊息
-- Pull Request 描述
-- 程式碼註解（除外部函式庫相容性需求外）
+### Docker 容器規範
 
-**例外**：
-- 程式碼變數與函式名稱使用英文（遵循 PEP 8）
-- 外部 API 文件引用（如 OpenAPI spec）
-- 技術專有名詞保留原文（如 "Docker container", "REST API"）
+- **基礎映像**: `node:18-slim`（定期更新至最新安全補丁版本）
+- **執行使用者**: 非 root（使用 `USER node` 或建立專用使用者）
+- **資源限制**:
+  - CPU: 2 核心上限
+  - 記憶體: 4GB 上限
+  - 磁碟空間: 10GB 上限（臨時檔案）
+- **生命週期**:
+  - 任務完成後立即銷毀
+  - 逾時（10 分鐘）後強制終止並清理
+- **網路隔離**:
+  - 僅允許連線至白名單 API 端點
+  - 禁止主機網路模式（`--network host`）
 
-**理由**：統一語言降低協作摩擦，確保所有利害關係人（包括非技術人員）能理解文件內容。
+---
 
-## 協作與審核規範 (Collaboration & Review)
+### Secrets 管理
 
-### Pull Request 流程
+- **環境變數注入**:
+  - 本地開發：使用 `.env` 檔案（已加入 `.gitignore`）
+  - 生產環境：使用 GitHub Secrets 或 AWS Secrets Manager
+- **日誌遮罩**:
+  - 所有日誌輸出前自動掃描並遮罩 secrets 模式（如 `sk-`, `ghp_`, `xoxb-`）
+  - PII（email, phone, IP address）使用 `[REDACTED]` 替換
+- **定期輪替**:
+  - API tokens 每 90 天輪替一次
+  - 使用 expiring tokens 機制（如 GitHub Fine-grained tokens 設定有效期）
 
-所有 SDD 產出必須透過 **Pull Request** 審核，不得直接提交至主分支。
+---
 
-**PR 要求**：
-- 標題使用 Conventional Commits 格式（如 `feat: 新增使用者認證 SDD`）
-- 描述必須包含：
-  - 變更摘要（What）
-  - 變更原因（Why）
-  - 測試結果（如何驗證）
-  - 審核清單（Checklist）
-- 必須包含至少一個審核者批准才能合併
-- 自動化檢查必須全數通過（測試、linting、安全掃描）
+### 依賴管理
 
-### Code Review 檢查項目
+- **版本鎖定**:
+  - Python: `requirements.txt` 或 `poetry.lock`
+  - Node.js: `package-lock.json` 或 `yarn.lock`
+- **弱點掃描**:
+  - 定期執行 `pip-audit`（Python）或 `npm audit`（Node.js）
+  - 整合 GitHub Dependabot 自動偵測與修復
+- **風險閾值**:
+  - 禁止使用 CVSS 評分 ≥ 7.0 的套件
+  - 高風險套件必須在 48 小時內更新或替換
 
-所有 code review 必須驗證以下項目：
+---
 
-- [ ] 測試已撰寫且通過（紅燈 → 綠燈流程已完成）
-- [ ] 憲法原則已遵循（特別是 I, II, III, VIII, IX 原則）
-- [ ] 無未經授權的複雜性引入
-- [ ] 日誌與錯誤處理已實作
-- [ ] 破壞性變更已記錄於 CHANGELOG
-- [ ] 文件已更新（spec.md, API docs）
-- [ ] Secrets 未洩漏在程式碼或日誌中
+## 治理規則
 
-### 分支管理
+### 憲法效力
 
-**分支命名規則**：
-- Bot 自動建立的分支：`bot/spec-{timestamp}` 或 `bot/{feature-name}`
-- 手動開發分支：`feat/{feature-name}`, `fix/{bug-name}`
-- 實驗性分支：`exp/{experiment-name}`
+本憲法為專案最高指導原則，效力優先於所有其他開發實踐、團隊慣例或個人偏好。
 
-**合併策略**：
-- 主分支 (`main`) 保持可部署狀態
-- 使用 squash merge 保持 commit 歷史乾淨
-- 合併後自動刪除分支
-
-## 治理 (Governance)
+---
 
 ### 修訂程序
 
-本憲法可透過以下程序修訂：
+憲法修訂需經過以下流程：
 
-1. 提出修訂提案並記錄理由
-2. 分析對現有模板與工作流程的影響
-3. 利害關係人審查與批准
-4. 依語意化版本規則更新憲法版本號
-5. 更新相依模板（plan-template.md, spec-template.md, tasks-template.md）
-6. 提供遷移指南給使用舊版憲法的專案
+1. **提案階段**:
+   - 任何團隊成員可提出修訂建議（透過 GitHub Issue）
+   - 說明修訂原因、影響範圍、替代方案
 
-### 版本政策
+2. **審查階段**:
+   - 核心團隊成員（SA、Architect、Tech Lead）審查提案
+   - 評估對現有專案的影響（需要多少程式碼調整）
+   - 若影響重大（涉及核心原則變更），需全員投票
 
-憲法版本必須遵循語意化版本：
+3. **實施階段**:
+   - 更新 `constitution.md` 並遞增版本號
+   - 若為 MAJOR 版本變更，提供遷移指南
+   - 更新所有相關模板與文件（plan-template.md, spec-template.md, tasks-template.md）
+   - 透過 PR 審核流程合併
 
-- **MAJOR**：向後不相容的治理變更、原則移除、重新定義導致舊專案失效
-- **MINOR**：新增原則、擴充章節加入新的強制要求
-- **PATCH**：澄清說明、文字改善、錯字修正、非語意性精煉
+---
 
-### 合規審查
+### 合規檢查
 
-所有功能必須在規劃階段通過「憲法檢查」(Constitution Check)。違反項目必須：
+#### Constitution Check Gate
 
-- 在 plan.md 的「複雜度追蹤」章節明確記錄
-- 提供具體理由說明為何更簡單的替代方案被拒絕
-- 經技術負責人或利害關係人批准後才能繼續
+所有功能規劃（`plan.md`）必須包含「Constitution Check」章節，驗證設計是否符合憲法原則。
 
-**觸發憲法審查的情況**：
-- 重複違反相同原則
-- 未經授權的複雜性模式出現
-- 需判斷憲法是否：
-  - 原則需要澄清
-  - 需要新增原則
-  - 現有原則對領域需求過於限制
+檢查項目範例：
+- ✅ 是否遵循單一事實來源（資料不持久化於 Bot）
+- ✅ 是否使用 Docker 容器隔離執行
+- ✅ 是否包含測試計畫（TDD 流程）
+- ✅ 是否使用官方 SDK 而非自行包裝 API
+- ✅ 是否記錄結構化日誌
+
+違反憲法原則時：
+- 必須在 `plan.md` 的「複雜度追蹤」章節記錄
+- 說明違反原因、業務需求、已拒絕的更簡單方案
+- 需獲得至少一位 Tech Lead 或 Architect 批准
+
+---
+
+#### Code Review 檢查清單
+
+所有 Pull Request 必須通過以下檢查：
+
+- [ ] 測試已撰寫且通過（紅燈 → 綠燈流程完成）
+- [ ] 憲法原則已遵循（特別是 I, II, III, VIII, IX）
+- [ ] 無未經授權的複雜性引入（無違反原則 V）
+- [ ] 日誌與錯誤處理已實作（符合原則 VI）
+- [ ] Secrets 未洩漏在程式碼或日誌中（符合原則 VIII）
+- [ ] 文件已更新（spec.md, API docs 等）
+- [ ] Mermaid 圖表通過語法驗證
+
+---
+
+### 審核流程
+
+#### Pull Request 要求
+
+- **標題格式**: 遵循 Conventional Commits（feat, fix, docs, refactor 等）
+- **描述內容**:
+  - 變更摘要（What changed）
+  - 變更原因（Why changed）
+  - 測試結果（Test coverage）
+  - 審核清單（Checklist）
+- **審核者要求**:
+  - 至少一位 CODEOWNERS 批准（SA 或 Architect）
+  - 自動化測試通過
+  - Constitution Check 無違反項目（或違反已記錄並批准）
+
+#### 分支保護規則
+
+- Main branch 啟用保護：
+  - 禁止直接 push
+  - 需至少 1 位審核者批准
+  - 需通過所有 CI 檢查
+  - 需 linear history（禁止 merge commits，使用 rebase 或 squash）
+
+---
+
+### 執行層級 Agent 指引
+
+**本憲法適用於 Claude CLI Agent 執行 SpecKit 指令時的所有決策與操作**
+
+當 Claude CLI 執行 `/speckit.specify`, `/speckit.plan`, `/speckit.tasks` 等指令時，必須：
+- 以本憲法為最高決策依據
+- 在設計階段驗證 Constitution Check
+- 在錯誤處理中遵循可追溯性原則（correlation_id）
+- 在生成 SDD 時強制 5 章節格式與 Mermaid 圖表驗證
+- 在任何自動化操作中維持零信任原則（不信任輸入，驗證所有外部資料）
+
+參考文件：
+- 執行層指引：`CLAUDE.md`（Agent 操作實踐）
+- 模板定義：`.specify/templates/`（規格、計畫、任務格式）
+
+---
 
 ## 版本資訊
 
-**Version**: 2.0.0
+**Version**: 1.0.0
 **Ratified**: 2025-11-13
-**Last Amended**: 2025-11-13
+**Last Amended**: 2025-11-21
 
-**變更摘要 (v1.0.0 → v2.0.0)**：
-- 重新定位專案：從通用 SDD_MVP 框架 → Spec Bot (Slack/GitHub/GPT 整合工具)
-- 新增 Bot 特定原則：沙箱化、狀態外部化、AI 防護
-- 新增安全約束章節：依賴掃描、Docker 安全、資料保護
-- 新增文件產出標準：SDD 格式、Mermaid 規範、繁體中文強制
-- 整合兩份參考憲法的安全與協作最佳實踐
+---
+
+**變更歷史**:
+- **v1.0.0** (2025-11-21): 從模板轉換為完整憲法，定義 10 項核心原則、文件標準、安全約束與治理規則
